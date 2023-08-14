@@ -1,18 +1,62 @@
 # WeexChat
 
-To start your Phoenix server:
+To start the Phoenix server:
 
-  * Run `mix setup` to install and setup dependencies
-  * Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
+- Run `mix setup` to install and setup dependencies
+- Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
 
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+Now visit [`localhost:4000`](http://localhost:4000) from your browser.
 
-Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
+## Entity-Relationship Diagram
 
-## Learn more
+```mermaid
+erDiagram
 
-  * Official website: https://www.phoenixframework.org/
-  * Guides: https://hexdocs.pm/phoenix/overview.html
-  * Docs: https://hexdocs.pm/phoenix
-  * Forum: https://elixirforum.com/c/phoenix-forum
-  * Source: https://github.com/phoenixframework/phoenix
+Message {
+  text content
+  id user_id
+  id channel_id
+}
+
+Channel {
+  string name
+  id creator_id
+  id member_id
+  boolean user_is_guest
+}
+
+ChannelSetting {
+  id channel_id
+  boolean allow_guests
+}
+
+User {
+  string username
+  string email
+  string hashed_password
+  naive_datetime confirmed_at
+}
+
+UserSetting {
+  id user_id
+  id color_theme_id
+}
+
+ColorTheme {
+  id creator_id
+  text color_map
+}
+
+UserChannel {
+  id user_id
+  id channel_id
+}
+
+User ||--O{ Message : "has_many"
+User }O--O{ UserChannel : "has_many"
+UserChannel }O--O{ Channel : "has_many"
+User ||--|| UserSetting : "has_one"
+Channel ||--O{ Message : "has_many"
+Channel ||--|| ChannelSetting : "has_one"
+ColorTheme ||--|{ UserSetting : "has_many"
+```
