@@ -40,3 +40,6 @@ assets/vendor/heroicons
 
 # custom env
 .env
+
+# elixir LS
+.elixir_ls
