@@ -6,7 +6,7 @@ defmodule WeexChatWeb.MessageLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, stream(socket, :messages, Chat.list_messages())}
+    {:ok, stream(socket, :messages, Chat.list_messages()), layout: false}
   end
 
   @impl true

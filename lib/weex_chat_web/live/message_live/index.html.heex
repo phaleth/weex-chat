@@ -1,41 +1,139 @@
-<.header>
-  Listing Messages
-  <:actions>
-    <.link patch={~p"/messages/new"}>
-      <.button>New Message</.button>
-    </.link>
-  </:actions>
-</.header>
-
-<.table
-  id="messages"
-  rows={@streams.messages}
-  row_click={fn {_id, message} -> JS.navigate(~p"/messages/#{message}") end}
->
-  <:col :let={{_id, message}} label="Content"><%= message.content %></:col>
-  <:action :let={{_id, message}}>
-    <div class="sr-only">
-      <.link navigate={~p"/messages/#{message}"}>Show</.link>
+<div class="flex h-screen">
+  <div class="flex-none w-auto px-1 bg-gray-200 text-black dark:bg-black dark:text-gray-300 border-r-2 border-green-500 dark:border-sky-600">
+    <div class="grid grid-cols-1">
+      <div class="flex gap-0.5">
+        <div class="w-6 text-right text-green-400 dark:text-lime-700">1.</div>
+        <div class="text-red-800 dark:text-indigo-600">network</div>
+      </div>
+      <div class="flex gap-0.5">
+        <div class="w-6 text-right text-green-400 dark:text-lime-700"></div>
+        <div class=" text-gray-700 dark:text-gray-400">weexchat</div>
+      </div>
+      <div class="flex gap-5">
+        <div class="w-6 text-right text-green-400 dark:text-lime-700">2.</div>
+        <div>#redacted</div>
+      </div>
+      <div class="flex gap-5">
+        <div class="w-6 text-right text-green-400 dark:text-lime-700">3.</div>
+        <div>#redacted</div>
+      </div>
+      <div class="flex gap-5">
+        <div class="w-6 text-right text-green-400 dark:text-lime-700">4.</div>
+        <div class="text-gray-700 dark:text-gray-400">#redacted</div>
+      </div>
+      <div class="flex gap-5">
+        <div class="w-6 text-right text-green-400 dark:text-lime-700">5.</div>
+        <div class="text-gray-700 dark:text-gray-400">#redacted</div>
+      </div>
+      <div class="flex gap-5">
+        <div class="w-6 text-right text-green-400 dark:text-lime-700">6.</div>
+        <div>#redacted</div>
+      </div>
+      <div class="flex gap-5">
+        <div class="w-6 text-right text-green-400 dark:text-lime-700">7.</div>
+        <div>#redacted</div>
+      </div>
+      <div class="flex gap-5">
+        <div class="w-6 text-right text-green-400 dark:text-lime-700">8.</div>
+        <div>#redacted</div>
+      </div>
+      <div class="flex gap-5 bg-green-500 dark:bg-blue-700 text-gray-700 dark:text-gray-400">
+        <div class="w-6 text-right text-green-400 dark:text-lime-700">9.</div>
+        <div>#lfe</div>
+      </div>
+      <div class="flex gap-5">
+        <div class="w-6 text-right text-green-400 dark:text-lime-700">10.</div>
+        <div>#redacted</div>
+      </div>
+      <div class="flex gap-5">
+        <div class="w-6 text-right text-green-400 dark:text-lime-700">11.</div>
+        <div class="text-gray-700 dark:text-gray-400">#redacted</div>
+      </div>
+      <div class="flex gap-5">
+        <div class="w-6 text-right text-green-400 dark:text-lime-700">12.</div>
+        <div>#redacted</div>
+      </div>
     </div>
-    <.link patch={~p"/messages/#{message}/edit"}>Edit</.link>
-  </:action>
-  <:action :let={{id, message}}>
-    <.link
-      phx-click={JS.push("delete", value: %{id: message.id}) |> hide("##{id}")}
-      data-confirm="Are you sure?"
-    >
-      Delete
-    </.link>
-  </:action>
-</.table>
-
-<.modal :if={@live_action in [:new, :edit]} id="message-modal" show on_cancel={JS.patch(~p"/messages")}>
-  <.live_component
-    module={WeexChatWeb.MessageLive.FormComponent}
-    id={@message.id || :new}
-    title={@page_title}
-    action={@live_action}
-    message={@message}
-    patch={~p"/messages"}
-  />
-</.modal>
+  </div>
+  <div class="flex-auto w-full px-1 bg-gray-200 text-black dark:bg-black dark:text-gray-300">
+    <div class="flex flex-col h-screen">
+      <div class="flex-none h-6 text-ellipsis overflow-hidden">
+        <div>
+          Little Fighter Empire | https://discord.gg/MWrHgT4h | https://lf-empire.de/forum/
+        </div>
+      </div>
+      <div class="flex-auto h-full">
+        <div class="grid grid-cols-[max-content_max-content_max-content_1fr]">
+          <div class="px-1">23:36</div>
+          <div class="px-1 text-right">--></div>
+          <div class="px-1 text-green-600 dark:text-lime-400">╡</div>
+          <div class="">phaleth (~phaleth@user/phaleth) has joined #lfe</div>
+          <div class="px-1">23:36</div>
+          <div class="px-1 text-right">ℹ&nbsp;&nbsp;</div>
+          <div class="px-1 text-green-600 dark:text-lime-400">╡</div>
+          <div>
+            Topic for #lfe is "Little Fighter Empire | https://discord.gg/MWrHgT4h | https://lf-empire.de/forum/"
+          </div>
+          <div class="px-1">23:36</div>
+          <div class="px-1 text-right">ℹ&nbsp;&nbsp;</div>
+          <div class="px-1 text-green-600 dark:text-lime-400">╡</div>
+          <div>
+            Topic set by redacted (~redacted@user/redacted) on Sun, 15 Aug 2021 13:14:38
+          </div>
+          <div class="px-1">23:36</div>
+          <div class="px-1 text-right">ℹ&nbsp;&nbsp;</div>
+          <div class="px-1 text-green-600 dark:text-lime-400">╡</div>
+          <div>Channel #lfe: 6 nicks (1 op, 0 voices, 5 normals)</div>
+          <div class="px-1">23:36</div>
+          <div class="px-1 text-right">ℹ&nbsp;&nbsp;</div>
+          <div class="px-1 text-green-600 dark:text-lime-400">╡</div>
+          <div>PvNotice(ChanServ): Yay things!</div>
+          <div class="px-1">23:36</div>
+          <div class="px-1 text-right">ℹ&nbsp;&nbsp;</div>
+          <div class="px-1 text-green-600 dark:text-lime-400">╡</div>
+          <div>Channel created on Tue, 15 Jun 2021 17:34:17</div>
+          <div class="px-1">23:36</div>
+          <div class="px-1 text-right text-green-700 dark:text-lime-500">phaleth</div>
+          <div class="px-1 text-green-600 dark:text-lime-400">╡</div>
+          <div>hello everyone</div>
+        </div>
+      </div>
+      <div class="flex-none h-12">
+        <div class="h-6 text-ellipsis overflow-hidden">
+          <span class="text-purple-700 dark:text-cyan-700">[</span>23:45<span class="text-purple-700 dark:text-cyan-700">]</span> <span class="text-purple-700 dark:text-cyan-700">[</span>13<span class="text-purple-700 dark:text-cyan-700">]</span> <span class="text-purple-700 dark:text-cyan-700">[</span>irc<span class="text-purple-700 dark:text-cyan-700">/</span>libera<span class="text-purple-700 dark:text-cyan-700">]</span>
+          <span class="text-green-600 dark:text-yellow-200">13</span><span class="text-purple-700 dark:text-cyan-700">:</span><span class="text-green-600 dark:text-lime-400">#lfe</span><span class="text-purple-700 dark:text-cyan-700">(</span>+nt<span class="text-purple-700 dark:text-cyan-700">){</span>6<span class="text-purple-700 dark:text-cyan-700">} [</span>Lag:
+          <span class="text-green-600 dark:text-yellow-200">0.549</span><span class="text-purple-700 dark:text-cyan-700">]</span>
+        </div>
+        <div>
+          <span class="text-purple-700 dark:text-cyan-700">[</span><span class="text-indigo-500 dark:text-teal-500">phaleth</span><span class="text-purple-700 dark:text-cyan-700">(</span>Ziw<span class="text-purple-700 dark:text-cyan-700">)]</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="flex-none w-auto px-1 bg-gray-200 text-black dark:bg-black dark:text-gray-300 border-l-2 border-green-500 dark:border-sky-600">
+    <div class="flex">
+      <div class="text-green-400 dark:text-lime-700">@</div>
+      <div>ChanServ</div>
+    </div>
+    <div class="flex gap-4">
+      <div></div>
+      <div>redacted</div>
+    </div>
+    <div class="flex gap-4">
+      <div></div>
+      <div>redacted</div>
+    </div>
+    <div class="flex gap-4">
+      <div></div>
+      <div>redacted</div>
+    </div>
+    <div class="flex gap-4">
+      <div></div>
+      <div>phaleth</div>
+    </div>
+    <div class="flex gap-4">
+      <div></div>
+      <div>redacted</div>
+    </div>
+  </div>
+</div>
