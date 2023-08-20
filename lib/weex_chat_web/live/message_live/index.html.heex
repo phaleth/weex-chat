@@ -1,5 +1,9 @@
-<div class="flex h-screen">
-  <div class="flex-none w-auto px-1 bg-gray-200 text-black dark:bg-black dark:text-gray-300 border-r-2 border-green-500 dark:border-sky-600">
+<div class="flex sm:flex-row flex-col h-screen">
+  <button class="wxch-chans-btn fixed top-2 right-2 sm:hidden text-2xl w-12 h-12 select-none bg-gray-400/40 dark:bg-slate-700/40 hover:bg-slate-800 focus:bg-slate-800 active:bg-slate-900 text-black dark:text-gray-300 flex flex-col justify-center items-center">
+    <div class="wxch-chans-ico-hamburger">&#9776;</div>
+    <div class="wxch-chans-ico-close hidden">&#128473;</div>
+  </button>
+  <div class="wxch-chans-list hidden sm:block flex-none w-auto h-40 sm:h-screen px-1 bg-gray-200 dark:bg-black text-black dark:text-gray-300 border-b-2 sm:border-b-0 sm:border-r-2 border-green-500 dark:border-sky-600 overflow-x-auto sm:overflow-x-hidden">
     <div class="grid grid-cols-1">
       <div class="flex gap-0.5">
         <div class="w-6 text-right text-green-400 dark:text-lime-700">1.</div>
@@ -55,15 +59,15 @@
       </div>
     </div>
   </div>
-  <div class="flex-auto w-full px-1 bg-gray-200 text-black dark:bg-black dark:text-gray-300">
-    <div class="flex flex-col h-screen">
+  <div class="flex-auto w-full px-1 bg-gray-200 dark:bg-black text-black dark:text-gray-300">
+    <div class="flex flex-col h-full">
       <div class="flex-none h-6 text-ellipsis overflow-hidden">
         <div>
           Little Fighter Empire | https://discord.gg/MWrHgT4h | https://lf-empire.de/forum/
         </div>
       </div>
       <div class="flex-auto h-full">
-        <div class="grid grid-cols-[max-content_max-content_max-content_1fr]">
+        <div class="grid grid-cols-[max-content_max-content_max-content_auto]">
           <div class="px-1">23:36</div>
           <div class="px-1 text-right">--></div>
           <div class="px-1 text-green-600 dark:text-lime-400">╡</div>
@@ -110,7 +114,7 @@
       </div>
     </div>
   </div>
-  <div class="flex-none w-auto px-1 bg-gray-200 text-black dark:bg-black dark:text-gray-300 border-l-2 border-green-500 dark:border-sky-600">
+  <div class="wxch-users-list hidden sm:block flex-none w-auto h-40 sm:h-screen px-1 bg-gray-200 text-black dark:bg-black dark:text-gray-300 border-t-2 sm:border-t-0 sm:border-l-2 border-green-500 dark:border-sky-600 overflow-x-auto sm:overflow-x-hidden">
     <div class="flex">
       <div class="text-green-400 dark:text-lime-700">@</div>
       <div>ChanServ</div>
@@ -135,5 +139,21 @@
       <div></div>
       <div>redacted</div>
     </div>
+    <div class="flex gap-4">
+      <div></div>
+      <div>redacted</div>
+    </div>
+    <div class="flex gap-4">
+      <div></div>
+      <div>redacted</div>
+    </div>
+    <div class="flex gap-4">
+      <div></div>
+      <div>redacted</div>
+    </div>
   </div>
+  <button class="wxch-users-btn fixed bottom-2 right-2 sm:hidden text-2xl w-12 h-12 select-none bg-gray-400/40 dark:bg-slate-700/40 hover:bg-slate-800 focus:bg-slate-800 active:bg-slate-900 text-black dark:text-gray-300 flex flex-col justify-center items-center">
+    <div class="wxch-users-ico-hamburger">&#9776;</div>
+    <div class="wxch-users-ico-close hidden">&#128473;</div>
+  </button>
 </div>
