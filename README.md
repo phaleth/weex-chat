@@ -45,6 +45,7 @@ erDiagram
 
 Message {
   text content
+  string from
   id user_id
   id channel_id
 }
