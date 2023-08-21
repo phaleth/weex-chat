@@ -44,4 +44,9 @@ defmodule WeexChatWeb.MessageLive.Index do
 
     {:noreply, stream_delete(socket, :messages, message)}
   end
+
+  @impl true
+  def handle_event("ping", _, socket) do
+    {:reply, %{}, socket}
+  end
 end
