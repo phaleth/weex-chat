@@ -62,6 +62,12 @@ ChannelSetting {
   boolean allow_guests
 }
 
+Topic {
+  id channel_id
+  text content
+  id user_id
+}
+
 User {
   string username
   string email
@@ -84,11 +90,13 @@ UserChannel {
   id channel_id
 }
 
-User ||--O{ Message : "has_many"
+User |O--O{ Message : "has_many"
 User }O--O{ UserChannel : "has_many"
 UserChannel }O--O{ Channel : "has_many"
+Channel |O--|| Topic : "has_one"
+User |O--O{ Topic : "has_many"
 User ||--|| UserSetting : "has_one"
-Channel ||--O{ Message : "has_many"
+Channel |O--O{ Message : "has_many"
 Channel ||--|| ChannelSetting : "has_one"
 ColorTheme ||--|{ UserSetting : "has_many"
 ```
