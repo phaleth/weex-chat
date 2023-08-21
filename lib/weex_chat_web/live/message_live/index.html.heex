@@ -68,38 +68,12 @@
       </div>
       <div class="flex-auto h-full">
         <div class="grid grid-cols-[max-content_max-content_max-content_auto]">
-          <div class="px-1">23:36</div>
-          <div class="px-1 text-right">--></div>
-          <div class="px-1 text-green-600 dark:text-lime-400">╡</div>
-          <div class="">phaleth (~phaleth@user/phaleth) has joined #lfe</div>
-          <div class="px-1">23:36</div>
-          <div class="px-1 text-right">ℹ&nbsp;&nbsp;</div>
-          <div class="px-1 text-green-600 dark:text-lime-400">╡</div>
-          <div>
-            Topic for #lfe is "Little Fighter Empire | https://discord.gg/MWrHgT4h | https://lf-empire.de/forum/"
-          </div>
-          <div class="px-1">23:36</div>
-          <div class="px-1 text-right">ℹ&nbsp;&nbsp;</div>
-          <div class="px-1 text-green-600 dark:text-lime-400">╡</div>
-          <div>
-            Topic set by redacted (~redacted@user/redacted) on Sun, 15 Aug 2021 13:14:38
-          </div>
-          <div class="px-1">23:36</div>
-          <div class="px-1 text-right">ℹ&nbsp;&nbsp;</div>
-          <div class="px-1 text-green-600 dark:text-lime-400">╡</div>
-          <div>Channel #lfe: 6 nicks (1 op, 0 voices, 5 normals)</div>
-          <div class="px-1">23:36</div>
-          <div class="px-1 text-right">ℹ&nbsp;&nbsp;</div>
-          <div class="px-1 text-green-600 dark:text-lime-400">╡</div>
-          <div>PvNotice(ChanServ): Yay things!</div>
-          <div class="px-1">23:36</div>
-          <div class="px-1 text-right">ℹ&nbsp;&nbsp;</div>
-          <div class="px-1 text-green-600 dark:text-lime-400">╡</div>
-          <div>Channel created on Tue, 15 Jun 2021 17:34:17</div>
-          <div class="px-1">23:36</div>
-          <div class="px-1 text-right text-green-700 dark:text-lime-500">phaleth</div>
-          <div class="px-1 text-green-600 dark:text-lime-400">╡</div>
-          <div>hello everyone</div>
+          <%= for {id, message} <- @streams.messages do %>
+            <div class="px-1"><%= Calendar.strftime(message.inserted_at, "%H:%M") %></div>
+            <div class={"px-1 text-right" <> if(message.from == "ℹ", do: " pr-3", else: "")}><%= message.from %></div>
+            <div class="px-1 text-green-600 dark:text-lime-400">╡</div>
+            <div id={id}><%= message.content %></div>
+          <% end %>
         </div>
       </div>
       <div class="flex-none h-12">
