@@ -3,10 +3,11 @@ defmodule WeexChatWeb.MessageLive.Index do
 
   alias WeexChat.Chat
   alias WeexChat.Chat.Message
+  alias WeexChat.Chat.Services.Color
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, stream(socket, :messages, Chat.list_messages()), layout: false}
+    {:ok, stream(socket, :messages, Color.list_messages()), layout: false}
   end
 
   @impl true

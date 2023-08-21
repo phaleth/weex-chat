@@ -70,7 +70,7 @@
         <div class="grid grid-cols-[max-content_max-content_max-content_auto]">
           <%= for {id, message} <- @streams.messages do %>
             <div class="px-1"><%= Calendar.strftime(message.inserted_at, "%H:%M") %></div>
-            <div class={"px-1 text-right" <> if(message.from == "ℹ", do: " pr-3", else: "")}><%= message.from %></div>
+            <div class={"px-1 text-right" <> if(message.from == "ℹ", do: " pr-3", else: "")} style={"color: #{message.from_color};"}><%= message.from %></div>
             <div class="px-1 text-green-600 dark:text-lime-400">╡</div>
             <div id={id}><%= message.content %></div>
           <% end %>
