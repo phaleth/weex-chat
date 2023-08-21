@@ -19,10 +19,9 @@ export const refreshSidebars = () => {
 
   let resizeTimeout;
   window.onresize = () => {
-    let width = window.innerWidth;
     clearTimeout(resizeTimeout);
     resizeTimeout = setTimeout(() => {
-      if (width > 639) {
+      if (window.innerWidth > 639) {
         chansListEl.classList.toggle("hidden");
         chansIcoBurgerEl.classList.toggle("hidden");
         chansIcoCloseEl.classList.toggle("hidden");
