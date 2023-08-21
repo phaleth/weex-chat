@@ -11,16 +11,3 @@
 <.list>
   <:item title="Content"><%= @message.content %></:item>
 </.list>
-
-<.back navigate={~p"/messages"}>Back to messages</.back>
-
-<.modal :if={@live_action == :edit} id="message-modal" show on_cancel={JS.patch(~p"/messages/#{@message}")}>
-  <.live_component
-    module={WeexChatWeb.MessageLive.FormComponent}
-    id={@message.id}
-    title={@page_title}
-    action={@live_action}
-    message={@message}
-    patch={~p"/messages/#{@message}"}
-  />
-</.modal>
