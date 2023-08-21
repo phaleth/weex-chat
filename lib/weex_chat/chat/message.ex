@@ -4,6 +4,8 @@ defmodule WeexChat.Chat.Message do
 
   schema "messages" do
     field :content, :string
+    field :from, :string
+    field :user_id, :id
 
     timestamps()
   end
@@ -11,7 +13,7 @@ defmodule WeexChat.Chat.Message do
   @doc false
   def changeset(message, attrs) do
     message
-    |> cast(attrs, [:content])
-    |> validate_required([:content])
+    |> cast(attrs, [:content, :from])
+    |> validate_required([:content, :from])
   end
 end
