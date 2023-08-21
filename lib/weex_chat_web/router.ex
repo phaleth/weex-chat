@@ -17,13 +17,8 @@ defmodule WeexChatWeb.Router do
   scope "/", WeexChatWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
-
-    live "/messages", MessageLive.Index, :index
-    live "/messages/new", MessageLive.Index, :new
+    live "/", MessageLive.Index, :index
     live "/messages/:id/edit", MessageLive.Index, :edit
-
-    live "/messages/:id", MessageLive.Show, :show
     live "/messages/:id/show/edit", MessageLive.Show, :edit
   end
 

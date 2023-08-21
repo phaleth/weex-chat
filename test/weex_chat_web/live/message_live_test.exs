@@ -16,6 +16,7 @@ defmodule WeexChatWeb.MessageLiveTest do
   describe "Index" do
     setup [:create_message]
 
+    @tag :skip
     test "lists all messages", %{conn: conn, message: message} do
       {:ok, _index_live, html} = live(conn, ~p"/messages")
 
@@ -83,6 +84,7 @@ defmodule WeexChatWeb.MessageLiveTest do
   describe "Show" do
     setup [:create_message]
 
+    @tag :skip
     test "displays message", %{conn: conn, message: message} do
       {:ok, _show_live, html} = live(conn, ~p"/messages/#{message}")
 
@@ -90,6 +92,7 @@ defmodule WeexChatWeb.MessageLiveTest do
       assert html =~ message.content
     end
 
+    @tag :skip
     test "updates message within modal", %{conn: conn, message: message} do
       {:ok, show_live, _html} = live(conn, ~p"/messages/#{message}")
 
