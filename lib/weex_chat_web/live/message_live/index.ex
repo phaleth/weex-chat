@@ -1,6 +1,8 @@
 defmodule WeexChatWeb.MessageLive.Index do
   use WeexChatWeb, :live_view
 
+  import WeexChatWeb.Components.Chat
+
   alias WeexChat.Chat
   alias WeexChat.Chat.Message
   alias WeexChat.Chat.Services.Color
@@ -49,5 +51,12 @@ defmodule WeexChatWeb.MessageLive.Index do
   @impl true
   def handle_event("ping", _, socket) do
     {:reply, %{}, socket}
+  end
+
+  @impl true
+  def render(assigns) do
+    ~H"""
+    <.chat streams={assigns.streams} />
+    """
   end
 end
