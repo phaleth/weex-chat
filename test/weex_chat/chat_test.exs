@@ -21,7 +21,7 @@ defmodule WeexChat.ChatTest do
     end
 
     test "create_message/1 with valid data creates a message" do
-      valid_attrs = %{content: "some content"}
+      valid_attrs = %{content: "some content", from: "Anonymous"}
 
       assert {:ok, %Message{} = message} = Chat.create_message(valid_attrs)
       assert message.content == "some content"

@@ -11,7 +11,8 @@ defmodule WeexChat.ChatFixtures do
     {:ok, message} =
       attrs
       |> Enum.into(%{
-        content: "some content"
+        content: "some content",
+        from: "Anonymous"
       })
       |> WeexChat.Chat.create_message()
 
