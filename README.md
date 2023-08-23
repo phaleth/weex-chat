@@ -75,13 +75,8 @@ User {
   naive_datetime confirmed_at
 }
 
-UserSetting {
-  id user_id
-  id color_theme_id
-}
-
 ColorTheme {
-  id creator_id
+  id user_id
   text color_map
 }
 
@@ -90,13 +85,11 @@ UserChannel {
   id channel_id
 }
 
-User |O--O{ Message : "has_many"
+User |O--O{ Message : "has_many (unconstrained)"
 User }O--O{ UserChannel : "has_many"
 UserChannel }O--O{ Channel : "has_many"
 Channel |O--|| Topic : "has_one"
-User |O--O{ Topic : "has_many"
-User ||--|| UserSetting : "has_one"
+User ||--|| ColorTheme : "has_one"
 Channel |O--O{ Message : "has_many"
 Channel ||--|| ChannelSetting : "has_one"
-ColorTheme ||--|{ UserSetting : "has_many"
 ```
