@@ -2,12 +2,14 @@
 // https://tailwindcss.com/docs/configuration
 
 const plugin = require("tailwindcss/plugin");
-const fs = require("fs");
-const path = require("path");
+const defaultTheme = require("tailwindcss/defaultTheme");
 
 module.exports = {
   content: ["./js/**/*.js", "../lib/*_web.ex", "../lib/*_web/**/*.*ex"],
   theme: {
+    fontFamily: {
+      mono: ["monospace", ...defaultTheme.fontFamily.mono],
+    },
     extend: {
       colors: {
         brand: "#FD4F00",
