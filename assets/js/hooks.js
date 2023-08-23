@@ -40,4 +40,16 @@ export const hooks = {
       });
     },
   },
+  msgSubmit: {
+    mounted() {
+      this.el.addEventListener("keydown", (e) => {
+        if (e.key == "Enter") {
+          this.el.form.dispatchEvent(
+            new Event("submit", { bubbles: true, cancelable: true })
+          );
+          this.el.value = "";
+        }
+      });
+    },
+  },
 };

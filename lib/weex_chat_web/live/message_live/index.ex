@@ -74,6 +74,20 @@ defmodule WeexChatWeb.MessageLive.Index do
   end
 
   @impl true
+  def handle_event("send-message", %{"msg" => msg}, socket) do
+    message =
+      %Message{
+        id: :dom_id,
+        user_id: nil,
+        from: "Newb",
+        content: msg
+      }
+      |> Map.put(:from_color, WeexChat.Generators.Color.get("Newb"))
+
+    {:noreply, stream_insert(socket, :messages, message)}
+  end
+
+  @impl true
   def render(assigns) do
     ~H"""
     <.chat loading={assigns.loading} streams={assigns.streams} />

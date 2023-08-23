@@ -3,3 +3,7 @@
 @import "tailwindcss/utilities";
 
 /* This file is for your main application CSS */
+
+input[type="text"]#msg:focus {
+  box-shadow: 0 0 0 0;
+}

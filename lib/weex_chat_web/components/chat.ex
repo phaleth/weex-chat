@@ -105,8 +105,19 @@ defmodule WeexChatWeb.Components.Chat do
               <span class="text-green-600 dark:text-yellow-200">13</span><span class="text-purple-700 dark:text-cyan-700">:</span><span class="text-green-600 dark:text-lime-400">#lfe</span><span class="text-purple-700 dark:text-cyan-700">(</span>+nt<span class="text-purple-700 dark:text-cyan-700">){</span>6<span class="text-purple-700 dark:text-cyan-700">} [</span>Lag:
               <span class="text-green-600 dark:text-yellow-200" id="ping" phx-hook="ping">-----</span><span class="text-purple-700 dark:text-cyan-700">]</span>
             </div>
-            <div>
-              <span class="text-purple-700 dark:text-cyan-700">[</span><span class="text-indigo-500 dark:text-teal-500">phaleth</span><span class="text-purple-700 dark:text-cyan-700">(</span>Ziw<span class="text-purple-700 dark:text-cyan-700">)]</span>
+            <div class="flex">
+              <span class="flex-none text-purple-700 dark:text-cyan-700">[</span><span class="text-indigo-500 dark:text-teal-500">phaleth</span><span class="text-purple-700 dark:text-cyan-700">(</span>Ziw<span class="text-purple-700 dark:text-cyan-700">)]</span>
+              <form class="flex-auto" id="msg-form" phx-submit="send-message">
+                <input
+                  class="pt-0 pb-1.5 px-1.5 h-5 w-full border-none bg-gray-200 dark:bg-black text-black dark:text-gray-300 placeholder-gray-600 dark:placeholder-gray-400 font-mono text-sm"
+                  aria-label="New message"
+                  type="text"
+                  id="msg"
+                  name="msg"
+                  placeholder="Type here..."
+                  phx-hook="msgSubmit"
+                />
+              </form>
             </div>
           </div>
         </div>
