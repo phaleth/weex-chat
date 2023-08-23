@@ -17,7 +17,7 @@ export const hooks = {
       this.updated();
     },
     updated() {
-      const date = new Date(this.el.textContent.replace(/.\d+Z$/, ""));
+      const date = new Date(this.el.textContent.replace(/\.\d+Z$/, ""));
       date.setHours(date.getHours() - new Date().getTimezoneOffset() / 60);
       this.el.textContent =
         String(date.getHours()).padStart(2, "0") +
