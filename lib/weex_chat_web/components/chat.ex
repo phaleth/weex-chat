@@ -99,7 +99,7 @@ defmodule WeexChatWeb.Components.Chat do
             <div class="h-6 text-ellipsis overflow-hidden">
               <span class="text-purple-700 dark:text-cyan-700">[</span><span :if={@loading}>--:--</span><span
                 :if={!@loading}
-                phx-hook="localTime"
+                phx-hook="currentTime"
                 id="current-time"
               ><%= DateTime.utc_now() |> DateTime.to_iso8601() %></span><span class="text-purple-700 dark:text-cyan-700">]</span> <span class="text-purple-700 dark:text-cyan-700">[</span>13<span class="text-purple-700 dark:text-cyan-700">]</span> <span class="text-purple-700 dark:text-cyan-700">[</span>irc<span class="text-purple-700 dark:text-cyan-700">/</span>libera<span class="text-purple-700 dark:text-cyan-700">]</span>
               <span class="text-green-600 dark:text-yellow-200">13</span><span class="text-purple-700 dark:text-cyan-700">:</span><span class="text-green-600 dark:text-lime-400">#lfe</span><span class="text-purple-700 dark:text-cyan-700">(</span>+nt<span class="text-purple-700 dark:text-cyan-700">){</span>6<span class="text-purple-700 dark:text-cyan-700">} [</span>Lag:

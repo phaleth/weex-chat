@@ -7,8 +7,12 @@ defmodule WeexChatWeb.MessageLive.Index do
   alias WeexChat.Chat.Message
   alias WeexChat.Chat.Services.Color
 
+  @one_second 1_000
+
   @impl true
   def mount(_params, _session, socket) do
+    Process.send_after(self(), :tick, @one_second)
+
     {:ok,
      socket
      |> assign(:loading, !connected?(socket))
@@ -41,6 +45,19 @@ defmodule WeexChatWeb.MessageLive.Index do
   @impl true
   def handle_info({WeexChatWeb.MessageLive.FormComponent, {:saved, message}}, socket) do
     {:noreply, stream_insert(socket, :messages, message)}
+  end
+
+  @impl true
+  def handle_info(:tick, socket) do
+    time =
+      DateTime.utc_now()
+      |> DateTime.to_iso8601()
+
+    Process.send_after(self(), :tick, @one_second)
+
+    {:noreply,
+     socket
+     |> push_event("tick", %{time: time})}
   end
 
   @impl true
