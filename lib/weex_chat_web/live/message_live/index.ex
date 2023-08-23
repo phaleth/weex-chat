@@ -9,7 +9,10 @@ defmodule WeexChatWeb.MessageLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, stream(socket, :messages, Color.list_messages()), layout: false}
+    {:ok,
+     socket
+     |> assign(:loading, !connected?(socket))
+     |> stream(:messages, Color.list_messages()), layout: false}
   end
 
   @impl true
@@ -56,7 +59,7 @@ defmodule WeexChatWeb.MessageLive.Index do
   @impl true
   def render(assigns) do
     ~H"""
-    <.chat streams={assigns.streams} />
+    <.chat loading={assigns.loading} streams={assigns.streams} />
     """
   end
 end

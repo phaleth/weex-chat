@@ -1,6 +1,7 @@
 defmodule WeexChatWeb.Components.Chat do
   use Phoenix.Component
 
+  attr :loading, :boolean
   attr :streams, :any
 
   def chat(assigns) do
@@ -76,7 +77,13 @@ defmodule WeexChatWeb.Components.Chat do
           <div class="flex-auto h-full">
             <div class="grid grid-cols-[max-content_max-content_max-content_auto]">
               <%= for {id, message} <- @streams.messages do %>
-                <div class="px-1"><%= Calendar.strftime(message.inserted_at, "%H:%M") %></div>
+                <div class="px-1">
+                  <%= if @loading do %>
+                    <span>--:--</span>
+                  <% else %>
+                    <span phx-hook="localTime" id={"#{id}-time"}><%= message.inserted_at %></span>
+                  <% end %>
+                </div>
                 <div
                   class={"px-1 text-right" <> if(message.from == "ℹ", do: " pr-3", else: "")}
                   style={"color: #{message.from_color};"}

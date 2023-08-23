@@ -12,4 +12,17 @@ export const hooks = {
       clearInterval(this.timer);
     },
   },
+  localTime: {
+    mounted() {
+      this.updated();
+    },
+    updated() {
+      const date = new Date(this.el.textContent);
+      date.setHours(date.getHours() - new Date().getTimezoneOffset() / 60);
+      this.el.textContent =
+        String(date.getHours()).padStart(2, "0") +
+        ":" +
+        String(date.getMinutes()).padStart(2, "0");
+    },
+  },
 };
