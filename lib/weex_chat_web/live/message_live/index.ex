@@ -38,7 +38,7 @@ defmodule WeexChatWeb.MessageLive.Index do
 
   defp apply_action(socket, :index, _params) do
     socket
-    |> assign(:page_title, "Listing Messages")
+    |> assign(:page_title, "weexchat")
     |> assign(:message, nil)
   end
 
