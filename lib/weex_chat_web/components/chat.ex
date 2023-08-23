@@ -77,7 +77,7 @@ defmodule WeexChatWeb.Components.Chat do
           <div class="flex-auto h-full">
             <div class="grid grid-cols-[max-content_max-content_max-content_auto]">
               <%= for {id, message} <- @streams.messages do %>
-                <div class="px-1">
+                <div class="pr-1">
                   <%= if @loading do %>
                     <span>--:--</span>
                   <% else %>
@@ -97,10 +97,13 @@ defmodule WeexChatWeb.Components.Chat do
           </div>
           <div class="flex-none h-12">
             <div class="h-6 text-ellipsis overflow-hidden">
-              <span class="text-purple-700 dark:text-cyan-700">[</span>23:45<span class="text-purple-700 dark:text-cyan-700">]</span> <span class="text-purple-700 dark:text-cyan-700">[</span>13<span class="text-purple-700 dark:text-cyan-700">]</span> <span class="text-purple-700 dark:text-cyan-700">[</span>irc<span class="text-purple-700 dark:text-cyan-700">/</span>libera<span class="text-purple-700 dark:text-cyan-700">]</span>
+              <span class="text-purple-700 dark:text-cyan-700">[</span><span :if={@loading}>--:--</span><span
+                :if={!@loading}
+                phx-hook="localTime"
+                id="current-time"
+              ><%= DateTime.utc_now() %></span><span class="text-purple-700 dark:text-cyan-700">]</span> <span class="text-purple-700 dark:text-cyan-700">[</span>13<span class="text-purple-700 dark:text-cyan-700">]</span> <span class="text-purple-700 dark:text-cyan-700">[</span>irc<span class="text-purple-700 dark:text-cyan-700">/</span>libera<span class="text-purple-700 dark:text-cyan-700">]</span>
               <span class="text-green-600 dark:text-yellow-200">13</span><span class="text-purple-700 dark:text-cyan-700">:</span><span class="text-green-600 dark:text-lime-400">#lfe</span><span class="text-purple-700 dark:text-cyan-700">(</span>+nt<span class="text-purple-700 dark:text-cyan-700">){</span>6<span class="text-purple-700 dark:text-cyan-700">} [</span>Lag:
-              <span class="text-green-600 dark:text-yellow-200" id="ping" phx-hook="ping">-----</span>
-              <span class="text-purple-700 dark:text-cyan-700">]</span>
+              <span class="text-green-600 dark:text-yellow-200" id="ping" phx-hook="ping">-----</span><span class="text-purple-700 dark:text-cyan-700">]</span>
             </div>
             <div>
               <span class="text-purple-700 dark:text-cyan-700">[</span><span class="text-indigo-500 dark:text-teal-500">phaleth</span><span class="text-purple-700 dark:text-cyan-700">(</span>Ziw<span class="text-purple-700 dark:text-cyan-700">)]</span>
