@@ -11,6 +11,7 @@ env:
 
 jobs:
   deploy-website:
+    name: Continuous Deployment
     if: github.repository_owner == 'phaleth'
     runs-on: ubuntu-latest
 
