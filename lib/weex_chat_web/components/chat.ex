@@ -1,4 +1,5 @@
 defmodule WeexChatWeb.Components.Chat do
+  @moduledoc false
   use Phoenix.Component
 
   attr :loading, :boolean

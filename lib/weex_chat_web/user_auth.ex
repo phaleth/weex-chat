@@ -1,4 +1,5 @@
 defmodule WeexChatWeb.UserAuth do
+  @moduledoc false
   use WeexChatWeb, :verified_routes
 
   import Plug.Conn

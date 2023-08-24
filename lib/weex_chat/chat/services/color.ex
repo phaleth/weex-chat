@@ -1,4 +1,5 @@
 defmodule WeexChat.Chat.Services.Color do
+  @moduledoc false
   alias WeexChat.Chat
   alias WeexChat.Generators.Color
 

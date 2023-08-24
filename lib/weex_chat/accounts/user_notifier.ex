@@ -1,4 +1,5 @@
 defmodule WeexChat.Accounts.UserNotifier do
+  @moduledoc false
   import Swoosh.Email
 
   alias WeexChat.Mailer
