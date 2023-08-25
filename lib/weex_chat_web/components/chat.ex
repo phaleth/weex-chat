@@ -77,7 +77,11 @@ defmodule WeexChatWeb.Components.Chat do
             </div>
           </div>
           <div class="flex-auto h-full">
-            <div class="grid grid-cols-[max-content_max-content_max-content_auto]">
+            <div
+              class="grid grid-cols-[max-content_max-content_max-content_auto]"
+              phx-update="stream"
+              id="messages-container"
+            >
               <%= for {id, message} <- @streams.messages do %>
                 <div class="pr-1">
                   <%= if @loading do %>

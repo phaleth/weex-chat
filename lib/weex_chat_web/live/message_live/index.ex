@@ -11,14 +11,16 @@ defmodule WeexChatWeb.MessageLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
-    if connected?(socket) do
+    is_connected = connected?(socket)
+
+    if is_connected do
       Process.send_after(self(), :tick, @one_second)
     end
 
     {:ok,
      socket
-     |> assign(loading: !connected?(socket), offset: 0)
-     |> stream(:messages, Color.list_messages()), layout: false}
+     |> assign(loading: !is_connected, offset: 0)
+     |> stream(:messages, []), layout: false}
   end
 
   @impl true
@@ -88,7 +90,7 @@ defmodule WeexChatWeb.MessageLive.Index do
   def handle_event("send-message", %{"msg" => msg}, socket) do
     message =
       %Message{
-        id: :dom_id,
+        id: Enum.random(8..9999),
         user_id: nil,
         from: "Newb",
         content: msg,
