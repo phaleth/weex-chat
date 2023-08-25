@@ -18,7 +18,8 @@ config :weex_chat, WeexChatWeb.Endpoint,
     layout: false
   ],
   pubsub_server: WeexChat.PubSub,
-  live_view: [signing_salt: "fV2Qgg4o"]
+  live_view: [signing_salt: "fV2Qgg4o"],
+  adapter: Bandit.PhoenixAdapter
 
 # Configures the mailer
 #
