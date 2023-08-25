@@ -1,13 +1,3 @@
-const toLocalTime = (textContent) => {
-  const date = new Date(textContent.replace(/\.\d+Z$/, ""));
-  date.setHours(date.getHours() - new Date().getTimezoneOffset() / 60);
-  return (
-    String(date.getHours()).padStart(2, "0") +
-    ":" +
-    String(date.getMinutes()).padStart(2, "0")
-  );
-};
-
 export const hooks = {
   ping: {
     mounted() {
@@ -24,19 +14,17 @@ export const hooks = {
       });
     },
   },
-  localTime: {
+  timeOffset: {
     mounted() {
-      this.updated();
-    },
-    updated() {
-      this.el.textContent = toLocalTime(this.el.textContent);
+      this.pushEvent("time-zone", {
+        offset: -new Date().getTimezoneOffset() / 60,
+      });
     },
   },
   currentTime: {
     mounted() {
-      this.el.textContent = toLocalTime(this.el.textContent);
       this.handleEvent("tick", ({ time }) => {
-        this.el.textContent = toLocalTime(time);
+        this.el.textContent = time;
       });
     },
   },

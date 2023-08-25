@@ -2,12 +2,13 @@ defmodule WeexChatWeb.Components.Chat do
   @moduledoc false
   use Phoenix.Component
 
-  attr :loading, :boolean
-  attr :streams, :any
+  attr(:loading, :boolean)
+  attr(:offset, :integer)
+  attr(:streams, :any)
 
   def chat(assigns) do
     ~H"""
-    <div class="flex sm:flex-row flex-col h-screen">
+    <div class="flex sm:flex-row flex-col h-screen" phx-hook="timeOffset" id="time-offset">
       <button class="wxch-chans-btn fixed top-2 right-2 sm:hidden text-2xl w-12 h-12 select-none bg-gray-400/40 dark:bg-slate-700/40 hover:bg-slate-800 focus:bg-slate-800 active:bg-slate-900 text-black dark:text-gray-300 flex flex-col justify-center items-center">
         <div class="wxch-chans-ico-hamburger">&#9776;</div>
         <div class="wxch-chans-ico-close hidden">&#128473;</div>
@@ -82,7 +83,11 @@ defmodule WeexChatWeb.Components.Chat do
                   <%= if @loading do %>
                     <span>--:--</span>
                   <% else %>
-                    <span phx-hook="localTime" id={"#{id}-time"}><%= message.inserted_at %></span>
+                    <span>
+                      <%= DateTime.from_naive!(message.inserted_at, "Etc/UTC")
+                      |> DateTime.add(@offset, :hour)
+                      |> Calendar.strftime("%H:%M") %>
+                    </span>
                   <% end %>
                 </div>
                 <div
@@ -102,7 +107,8 @@ defmodule WeexChatWeb.Components.Chat do
                 :if={!@loading}
                 phx-hook="currentTime"
                 id="current-time"
-              ><%= DateTime.utc_now() |> DateTime.to_iso8601() %></span><span class="text-purple-700 dark:text-cyan-700">]</span> <span class="text-purple-700 dark:text-cyan-700">[</span>13<span class="text-purple-700 dark:text-cyan-700">]</span> <span class="text-purple-700 dark:text-cyan-700">[</span>irc<span class="text-purple-700 dark:text-cyan-700">/</span>libera<span class="text-purple-700 dark:text-cyan-700">]</span>
+              ><%= DateTime.utc_now() |> DateTime.add(@offset, :hour)
+              |> Calendar.strftime("%H:%M") %></span><span class="text-purple-700 dark:text-cyan-700">]</span> <span class="text-purple-700 dark:text-cyan-700">[</span>13<span class="text-purple-700 dark:text-cyan-700">]</span> <span class="text-purple-700 dark:text-cyan-700">[</span>irc<span class="text-purple-700 dark:text-cyan-700">/</span>libera<span class="text-purple-700 dark:text-cyan-700">]</span>
               <span class="text-green-600 dark:text-yellow-200">13</span><span class="text-purple-700 dark:text-cyan-700">:</span><span class="text-green-600 dark:text-lime-400">#lfe</span><span class="text-purple-700 dark:text-cyan-700">(</span>+nt<span class="text-purple-700 dark:text-cyan-700">){</span>6<span class="text-purple-700 dark:text-cyan-700">} [</span>Lag:
               <span class="text-green-600 dark:text-yellow-200" id="ping" phx-hook="ping">-----</span><span class="text-purple-700 dark:text-cyan-700">]</span>
             </div>

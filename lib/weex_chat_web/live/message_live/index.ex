@@ -11,11 +11,13 @@ defmodule WeexChatWeb.MessageLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
-    Process.send_after(self(), :tick, @one_second)
+    if connected?(socket) do
+      Process.send_after(self(), :tick, @one_second)
+    end
 
     {:ok,
      socket
-     |> assign(:loading, !connected?(socket))
+     |> assign(loading: !connected?(socket), offset: 0)
      |> stream(:messages, Color.list_messages()), layout: false}
   end
 
@@ -51,7 +53,8 @@ defmodule WeexChatWeb.MessageLive.Index do
   def handle_info(:tick, socket) do
     time =
       DateTime.utc_now()
-      |> DateTime.to_iso8601()
+      |> DateTime.add(socket.assigns.offset, :hour)
+      |> Calendar.strftime("%H:%M")
 
     Process.send_after(self(), :tick, @one_second)
 
@@ -69,8 +72,16 @@ defmodule WeexChatWeb.MessageLive.Index do
   end
 
   @impl true
-  def handle_event("ping", _, socket) do
-    {:reply, %{}, socket}
+  def handle_event("ping", _params, socket) do
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("time-zone", %{"offset" => offset}, socket) do
+    {:noreply,
+     socket
+     |> assign(offset: offset)
+     |> stream(:messages, Color.list_messages())}
   end
 
   @impl true
@@ -80,7 +91,8 @@ defmodule WeexChatWeb.MessageLive.Index do
         id: :dom_id,
         user_id: nil,
         from: "Newb",
-        content: msg
+        content: msg,
+        inserted_at: DateTime.utc_now()
       }
       |> Map.put(:from_color, WeexChat.Generators.Color.get("Newb"))
 
@@ -90,7 +102,7 @@ defmodule WeexChatWeb.MessageLive.Index do
   @impl true
   def render(assigns) do
     ~H"""
-    <.chat loading={assigns.loading} streams={assigns.streams} />
+    <.chat loading={assigns.loading} offset={assigns.offset} streams={assigns.streams} />
     """
   end
 end
