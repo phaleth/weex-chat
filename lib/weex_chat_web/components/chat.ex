@@ -76,7 +76,7 @@ defmodule WeexChatWeb.Components.Chat do
               Little Fighter Empire | https://discord.gg/MWrHgT4h | https://lf-empire.de/forum/
             </div>
           </div>
-          <div class="flex-auto h-full">
+          <div class="flex-auto h-full overflow-x-auto">
             <div
               class="grid grid-cols-[max-content_max-content_max-content_auto]"
               phx-update="stream"
