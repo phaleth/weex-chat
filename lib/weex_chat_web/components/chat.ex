@@ -71,7 +71,7 @@ defmodule WeexChatWeb.Components.Chat do
       </div>
       <div class="flex-auto w-full px-1">
         <div class="flex flex-col h-full">
-          <div class="flex-none h-6 text-ellipsis overflow-hidden">
+          <div class="flex-none h-5 text-ellipsis overflow-hidden">
             <div>
               Little Fighter Empire | https://discord.gg/MWrHgT4h | https://lf-empire.de/forum/
             </div>
@@ -106,7 +106,7 @@ defmodule WeexChatWeb.Components.Chat do
             </div>
           </div>
           <div class="flex-none h-12">
-            <div class="h-6 text-ellipsis overflow-hidden">
+            <div class="h-5 text-ellipsis overflow-hidden">
               <span class="text-purple-700 dark:text-cyan-700">[</span><span :if={@loading}>--:--</span><span
                 :if={!@loading}
                 phx-hook="currentTime"
