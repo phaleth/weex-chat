@@ -80,17 +80,21 @@ defmodule WeexChatWeb.MessageLive.Index do
 
   @impl true
   def handle_event("time-zone", %{"offset" => offset}, socket) do
+    messages = Color.list_messages()
+
     {:noreply,
      socket
-     |> assign(offset: offset)
-     |> stream(:messages, Color.list_messages())}
+     |> assign(offset: offset, newest_message_id: List.last(messages).id)
+     |> stream(:messages, messages)}
   end
 
   @impl true
   def handle_event("send-message", %{"msg" => msg}, socket) do
+    new_msg_id = socket.assigns.newest_message_id + 1
+
     message =
       %Message{
-        id: Enum.random(8..9999),
+        id: new_msg_id,
         user_id: nil,
         from: "Newb",
         content: msg,
@@ -98,7 +102,10 @@ defmodule WeexChatWeb.MessageLive.Index do
       }
       |> Map.put(:from_color, WeexChat.Generators.Color.get("Newb"))
 
-    {:noreply, stream_insert(socket, :messages, message)}
+    {:noreply,
+     socket
+     |> assign(:newest_message_id, new_msg_id)
+     |> stream_insert(:messages, message)}
   end
 
   @impl true
