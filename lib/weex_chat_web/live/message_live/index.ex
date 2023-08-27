@@ -81,10 +81,12 @@ defmodule WeexChatWeb.MessageLive.Index do
   @impl true
   def handle_event("time-zone", %{"offset" => offset}, socket) do
     messages = Color.list_messages()
+    last_msg = List.last(messages)
+    newest_message_id = if is_nil(last_msg), do: 0, else: last_msg.id
 
     {:noreply,
      socket
-     |> assign(offset: offset, newest_message_id: List.last(messages).id)
+     |> assign(offset: offset, newest_message_id: newest_message_id)
      |> stream(:messages, messages)}
   end
 
