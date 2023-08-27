@@ -1,4 +1,4 @@
-export const hooks = {
+export default hooks = {
   ping: {
     mounted() {
       let count = 0;
