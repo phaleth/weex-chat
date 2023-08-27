@@ -84,9 +84,7 @@ defmodule WeexChatWeb.Components.Chat do
             >
               <%= for {id, message} <- @streams.messages do %>
                 <div class="pr-1">
-                  <%= if @loading do %>
-                    <span>--:--</span>
-                  <% else %>
+                  <%= if !@loading do %>
                     <span>
                       <%= DateTime.from_naive!(message.inserted_at, "Etc/UTC")
                       |> DateTime.add(@offset, :hour)
