@@ -40,4 +40,18 @@ export default hooks = {
       });
     },
   },
+  delMsg: {
+    mounted() {
+      this.el.addEventListener("click", () => {
+        const text = this.el.parentElement;
+        const splitter = text.previousElementSibling;
+        const from = splitter.previousElementSibling;
+        const time = from.previousElementSibling;
+        text.remove();
+        splitter.remove();
+        from.remove();
+        time.remove();
+      });
+    },
+  },
 };

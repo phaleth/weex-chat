@@ -91,7 +91,7 @@ defmodule WeexChatWeb.MessageLive.Index do
   end
 
   @impl true
-  def handle_event("send-message", %{"msg" => msg}, socket) do
+  def handle_event("new-msg", %{"msg" => msg}, socket) do
     new_msg_id = socket.assigns.newest_message_id + 1
 
     message =
@@ -108,6 +108,12 @@ defmodule WeexChatWeb.MessageLive.Index do
      socket
      |> assign(:newest_message_id, new_msg_id)
      |> stream_insert(:messages, message)}
+  end
+
+  @impl true
+  def handle_event("del-msg", %{"id" => "messages-" <> id}, socket) do
+    IO.puts(id)
+    {:noreply, socket}
   end
 
   @impl true

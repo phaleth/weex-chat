@@ -1,6 +1,7 @@
 defmodule WeexChatWeb.Components.Chat do
   @moduledoc false
   use Phoenix.Component
+  alias Phoenix.LiveView.JS
 
   attr(:loading, :boolean)
   attr(:offset, :integer)
@@ -99,7 +100,17 @@ defmodule WeexChatWeb.Components.Chat do
                   <%= message.from %>
                 </div>
                 <div class="px-1 text-green-600 dark:text-lime-400">╡</div>
-                <div id={id}><%= message.content %></div>
+                <div class="group" id={id}>
+                  <%= message.content %>
+                  <span
+                    id={"#{id}-del"}
+                    phx-click={JS.push("del-msg", value: %{id: id})}
+                    phx-hook="delMsg"
+                    class="hidden group-hover:inline cursor-pointer"
+                  >
+                    &#10060;
+                  </span>
+                </div>
               <% end %>
             </div>
           </div>
@@ -116,7 +127,7 @@ defmodule WeexChatWeb.Components.Chat do
             </div>
             <div class="flex">
               <span class="flex-none text-purple-700 dark:text-cyan-700">[</span><span class="text-indigo-500 dark:text-teal-500">phaleth</span><span class="text-purple-700 dark:text-cyan-700">(</span>Ziw<span class="text-purple-700 dark:text-cyan-700">)]</span>
-              <form class="flex-auto" id="msg-form" phx-submit="send-message">
+              <.form for={%{}} class="flex-auto" id="msg-form" phx-submit="new-msg">
                 <input
                   class="pt-0 pb-1.5 px-1.5 h-5 w-full border-none bg-gray-200 dark:bg-black text-black dark:text-gray-300 placeholder-gray-600 dark:placeholder-gray-400 font-mono text-sm"
                   aria-label="New message"
@@ -126,7 +137,7 @@ defmodule WeexChatWeb.Components.Chat do
                   placeholder="Type here..."
                   phx-hook="msgSubmit"
                 />
-              </form>
+              </.form>
             </div>
           </div>
         </div>
