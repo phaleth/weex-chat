@@ -22,8 +22,6 @@ defmodule WeexChatWeb.Router do
 
     live_session :messages, on_mount: [{WeexChatWeb.UserAuth, :mount_current_user}] do
       live "/", MessageLive.Index, :index
-      live "/messages/:id/edit", MessageLive.Index, :edit
-      live "/messages/:id/show/edit", MessageLive.Show, :edit
     end
   end
 
