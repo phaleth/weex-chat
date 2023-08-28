@@ -20,9 +20,11 @@ defmodule WeexChatWeb.Router do
   scope "/", WeexChatWeb do
     pipe_through :browser
 
-    live "/", MessageLive.Index, :index
-    live "/messages/:id/edit", MessageLive.Index, :edit
-    live "/messages/:id/show/edit", MessageLive.Show, :edit
+    live_session :messages, on_mount: [{WeexChatWeb.UserAuth, :mount_current_user}] do
+      live "/", MessageLive.Index, :index
+      live "/messages/:id/edit", MessageLive.Index, :edit
+      live "/messages/:id/show/edit", MessageLive.Show, :edit
+    end
   end
 
   # Other scopes may use custom stacks.

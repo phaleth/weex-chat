@@ -94,15 +94,22 @@ defmodule WeexChatWeb.MessageLive.Index do
   def handle_event("new-msg", %{"msg" => msg}, socket) do
     new_msg_id = socket.assigns.newest_message_id + 1
 
+    {user_id, username} =
+      if socket.assigns[:current_user] do
+        {socket.assigns.current_user.id, socket.assigns.current_user.username}
+      else
+        {nil, "Anonymous"}
+      end
+
     message =
       %Message{
         id: new_msg_id,
-        user_id: nil,
-        from: "Newb",
+        user_id: user_id,
+        from: username,
         content: msg,
         inserted_at: DateTime.utc_now()
       }
-      |> Map.put(:from_color, WeexChat.Generators.Color.get("Newb"))
+      |> Map.put(:from_color, WeexChat.Generators.Color.get(username))
 
     {:noreply,
      socket
