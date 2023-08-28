@@ -12,48 +12,43 @@
     </script>
   </head>
   <body class="bg-gray-200 dark:bg-black text-black dark:text-gray-300 font-mono text-sm antialiased">
-    <div class="hidden">
-      <ul class="relative z-10 flex items-center gap-4 px-4 sm:px-6 lg:px-8 justify-end">
+    <div class="absolute">
+      <div class="fixed top-0 mx-auto inset-x-0 peer w-20 h-5 opacity-0"></div>
+      <div class="hidden peer-hover:flex hover:flex
+         w-[200px]
+         flex-col bg-white drop-shadow-lg fixed top-0 mx-auto inset-x-0">
         <%= if @current_user do %>
-          <li class="text-[0.8125rem] leading-6 text-zinc-900">
-            <%= @current_user.email %>
-          </li>
-          <li>
-            <.link
-              href={~p"/users/settings"}
-              class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
-            >
-              Settings
-            </.link>
-          </li>
-          <li>
-            <.link
-              href={~p"/users/log_out"}
-              method="delete"
-              class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
-            >
-              Log out
-            </.link>
-          </li>
+          <div class="px-5 py-3 bg-gray-400 dark:bg-slate-700 hover:bg-slate-800 focus:bg-slate-800 active:bg-slate-900 text-black dark:text-gray-300">
+            <%= @current_user.username %>
+          </div>
+          <.link
+            href={~p"/users/settings"}
+            class="px-5 py-3 bg-gray-400 dark:bg-slate-700 hover:bg-slate-800 focus:bg-slate-800 active:bg-slate-900 text-black dark:text-gray-300"
+          >
+            Settings
+          </.link>
+          <.link
+            href={~p"/users/log_out"}
+            method="delete"
+            class="px-5 py-3 bg-gray-400 dark:bg-slate-700 hover:bg-slate-800 focus:bg-slate-800 active:bg-slate-900 text-black dark:text-gray-300"
+          >
+            Log out
+          </.link>
         <% else %>
-          <li>
-            <.link
-              href={~p"/users/register"}
-              class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
-            >
-              Register
-            </.link>
-          </li>
-          <li>
-            <.link
-              href={~p"/users/log_in"}
-              class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
-            >
-              Log in
-            </.link>
-          </li>
+          <.link
+            class="px-5 py-3 bg-gray-400 dark:bg-slate-700 hover:bg-slate-800 focus:bg-slate-800 active:bg-slate-900 text-black dark:text-gray-300"
+            href={~p"/users/register"}
+          >
+            Register
+          </.link>
+          <.link
+            href={~p"/users/log_in"}
+            class="px-5 py-3 bg-gray-400 dark:bg-slate-700 hover:bg-slate-800 focus:bg-slate-800 active:bg-slate-900 text-black dark:text-gray-300"
+          >
+            Log in
+          </.link>
         <% end %>
-      </ul>
+      </div>
     </div>
     <%= @inner_content %>
   </body>
