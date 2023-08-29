@@ -113,7 +113,7 @@ defmodule WeexChatWeb.Components.Chat do
                     id={"del-#{id}"}
                     phx-click={JS.push("del-msg", value: %{id: id})}
                     phx-hook="delMsg"
-                    class="flex-auto ml-2 hidden group-hover:inline cursor-pointer"
+                    class="flex-none ml-2 hidden group-hover:inline cursor-pointer"
                   >
                     &#10060;
                   </span>
