@@ -4,6 +4,10 @@
 
 /* This file is for your main application CSS */
 
-input[type="text"]#msg:focus {
+.wxch-remove-box-shadow:focus {
   box-shadow: 0 0 0 0;
+}
+
+.wxch-hide {
+  height: 0;
 }

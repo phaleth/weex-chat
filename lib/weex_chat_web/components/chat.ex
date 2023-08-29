@@ -100,13 +100,20 @@ defmodule WeexChatWeb.Components.Chat do
                   <%= message.from %>
                 </div>
                 <div class="px-1 text-green-600 dark:text-lime-400">╡</div>
-                <div class="group" id={id}>
-                  <%= message.content %>
+                <div class="flex group" id={id}>
+                  <span class="flex-none"><%= message.content %></span>
+                  <span
+                    id={"mod-#{id}"}
+                    phx-hook="modMsg"
+                    class="flex-none ml-2 hidden group-hover:inline cursor-pointer text-lime-200"
+                  >
+                    &#128393;
+                  </span>
                   <span
                     id={"#{id}-del"}
                     phx-click={JS.push("del-msg", value: %{id: id})}
                     phx-hook="delMsg"
-                    class="hidden group-hover:inline cursor-pointer"
+                    class="flex-auto ml-2 hidden group-hover:inline cursor-pointer"
                   >
                     &#10060;
                   </span>
@@ -127,9 +134,9 @@ defmodule WeexChatWeb.Components.Chat do
             </div>
             <div class="flex">
               <span class="flex-none text-purple-700 dark:text-cyan-700">[</span><span class="text-indigo-500 dark:text-teal-500">phaleth</span><span class="text-purple-700 dark:text-cyan-700">(</span>Ziw<span class="text-purple-700 dark:text-cyan-700">)]</span>
-              <.form for={%{}} class="flex-auto" id="msg-form" phx-submit="new-msg">
+              <form class="flex-auto" id="msg-form" phx-submit="new-msg">
                 <input
-                  class="pt-0 pb-1.5 px-1.5 h-5 w-full border-none bg-gray-200 dark:bg-black text-black dark:text-gray-300 placeholder-gray-600 dark:placeholder-gray-400 font-mono text-sm"
+                  class="wxch-remove-box-shadow pt-0 pb-1.5 px-1.5 h-5 w-full border-none bg-gray-200 dark:bg-black text-black dark:text-gray-300 placeholder-gray-600 dark:placeholder-gray-400 font-mono text-sm"
                   aria-label="New message"
                   type="text"
                   id="msg"
@@ -137,7 +144,7 @@ defmodule WeexChatWeb.Components.Chat do
                   placeholder="Type here..."
                   phx-hook="msgSubmit"
                 />
-              </.form>
+              </form>
             </div>
           </div>
         </div>
