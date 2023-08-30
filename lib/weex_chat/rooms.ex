@@ -49,9 +49,9 @@ defmodule WeexChat.Rooms do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_channel(attrs \\ %{}) do
+  def create_channel(attrs \\ %{}, users \\ []) do
     %Channel{}
-    |> Channel.changeset(attrs)
+    |> Channel.changeset(attrs, users)
     |> Repo.insert()
   end
 
@@ -67,9 +67,9 @@ defmodule WeexChat.Rooms do
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_channel(%Channel{} = channel, attrs) do
+  def update_channel(%Channel{} = channel, attrs, users \\ []) do
     channel
-    |> Channel.changeset(attrs)
+    |> Channel.changeset(attrs, users)
     |> Repo.update()
   end
 
@@ -98,7 +98,7 @@ defmodule WeexChat.Rooms do
       %Ecto.Changeset{data: %Channel{}}
 
   """
-  def change_channel(%Channel{} = channel, attrs \\ %{}) do
-    Channel.changeset(channel, attrs)
+  def change_channel(%Channel{} = channel, attrs \\ %{}, users \\ []) do
+    Channel.changeset(channel, attrs, users)
   end
 end
