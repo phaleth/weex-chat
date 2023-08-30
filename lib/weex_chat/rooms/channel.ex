@@ -1,4 +1,5 @@
 defmodule WeexChat.Rooms.Channel do
+  @moduledoc false
   use Ecto.Schema
   import Ecto.Changeset
 
