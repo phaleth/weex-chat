@@ -58,7 +58,10 @@ defmodule WeexChat.Accounts do
       ** (Ecto.NoResultsError)
 
   """
-  def get_user!(id), do: Repo.get!(User, id)
+  def get_user!(id) do
+    from(u in User, preload: [:channels])
+    |> Repo.get!(id)
+  end
 
   ## User registration
 

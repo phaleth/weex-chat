@@ -18,7 +18,8 @@ defmodule WeexChat.Rooms do
 
   """
   def list_channels do
-    Repo.all(Channel)
+    from(ch in Channel, preload: [:users])
+    |> Repo.all()
   end
 
   @doc """
@@ -35,7 +36,10 @@ defmodule WeexChat.Rooms do
       ** (Ecto.NoResultsError)
 
   """
-  def get_channel!(id), do: Repo.get!(Channel, id)
+  def get_channel!(id) do
+    from(ch in Channel, where: ch.id == ^id, preload: [:users])
+    |> Repo.one!()
+  end
 
   @doc """
   Creates a channel.
