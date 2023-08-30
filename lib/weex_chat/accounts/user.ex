@@ -50,7 +50,7 @@ defmodule WeexChat.Accounts.User do
     |> validate_required([:username])
     |> validate_format(:username, ~r/^[^\s]+$/, message: "must have no spaces")
     |> validate_length(:username, max: 140)
-    |> maybe_validate_unique_email(opts)
+    |> maybe_validate_unique_username(opts)
   end
 
   defp validate_email(changeset, opts) do
@@ -84,6 +84,16 @@ defmodule WeexChat.Accounts.User do
       # would keep the database transaction open longer and hurt performance.
       |> put_change(:hashed_password, Bcrypt.hash_pwd_salt(password))
       |> delete_change(:password)
+    else
+      changeset
+    end
+  end
+
+  defp maybe_validate_unique_username(changeset, opts) do
+    if Keyword.get(opts, :validate_username, true) do
+      changeset
+      |> unsafe_validate_unique(:username, WeexChat.Repo)
+      |> unique_constraint(:username)
     else
       changeset
     end
