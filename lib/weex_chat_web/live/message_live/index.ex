@@ -6,6 +6,8 @@ defmodule WeexChatWeb.MessageLive.Index do
   alias WeexChat.Chat
   alias WeexChat.Chat.Message
   alias WeexChat.Chat.Services.Color
+  alias WeexChat.Accounts
+  alias WeexChat.Rooms
 
   @one_second 1_000
 
@@ -17,10 +19,18 @@ defmodule WeexChatWeb.MessageLive.Index do
       Process.send_after(self(), :tick, @one_second)
     end
 
+    user = socket.assigns[:current_user]
+
+    channels =
+      if user,
+        do: Accounts.get_user!(user.id).channels,
+        else: []
+
     {:ok,
      socket
      |> assign(loading: !is_connected, offset: 0)
-     |> stream(:messages, []), layout: false}
+     |> stream(:messages, [])
+     |> stream(:channels, channels), layout: false}
   end
 
   @impl true
@@ -92,29 +102,35 @@ defmodule WeexChatWeb.MessageLive.Index do
 
   @impl true
   def handle_event("new-msg", %{"msg" => msg}, socket) do
-    new_msg_id = socket.assigns.newest_message_id + 1
+    user = socket.assigns[:current_user]
 
     {user_id, username} =
-      if socket.assigns[:current_user] do
-        {socket.assigns.current_user.id, socket.assigns.current_user.username}
+      if user,
+        do: {user.id, user.username},
+        else: {nil, "Anonymous"}
+
+    socket =
+      if String.starts_with?(msg, "/create ") do
+        exec_create_command(socket, msg, user_id)
       else
-        {nil, "Anonymous"}
+        new_msg_id = socket.assigns.newest_message_id + 1
+
+        message =
+          %Message{
+            id: new_msg_id,
+            user_id: user_id,
+            from: username,
+            content: msg,
+            inserted_at: DateTime.utc_now()
+          }
+          |> Map.put(:from_color, WeexChat.Generators.Color.get(username))
+
+        socket
+        |> assign(:newest_message_id, new_msg_id)
+        |> stream_insert(:messages, message)
       end
 
-    message =
-      %Message{
-        id: new_msg_id,
-        user_id: user_id,
-        from: username,
-        content: msg,
-        inserted_at: DateTime.utc_now()
-      }
-      |> Map.put(:from_color, WeexChat.Generators.Color.get(username))
-
-    {:noreply,
-     socket
-     |> assign(:newest_message_id, new_msg_id)
-     |> stream_insert(:messages, message)}
+    {:noreply, socket}
   end
 
   @impl true
@@ -128,6 +144,35 @@ defmodule WeexChatWeb.MessageLive.Index do
   def handle_event("del-msg", %{"id" => "messages-" <> id}, socket) do
     IO.puts(id)
     {:noreply, socket}
+  end
+
+  defp create_channel_by_name(socket, channel_name, user_id) do
+    case Rooms.create_channel(%{
+           name: channel_name,
+           user_is_guest: is_nil(user_id)
+         }) do
+      {:ok, channel} ->
+        socket
+        |> stream_insert(:channels, channel)
+
+      {:error, %Ecto.Changeset{} = changeset} ->
+        {_, error} = List.first(changeset.errors)
+        socket |> put_flash(:error, error)
+    end
+  end
+
+  defp exec_create_command(socket, msg, user_id) do
+    case msg do
+      "/create " <> channel ->
+        words = String.split(channel, " ", trim: true)
+
+        if length(words) === 1 do
+          create_channel_by_name(socket, List.first(words), user_id)
+        end
+
+      _ ->
+        socket
+    end
   end
 
   @impl true
