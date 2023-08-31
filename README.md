@@ -31,6 +31,37 @@ Verify environment variables are loaded
 echo $POSTGRES_USERNAME
 ```
 
+Ecto.Query
+
+```sh
+iex> import Ecto.Query
+Ecto.Query
+
+iex> from(u in "users_channels", select: [u.user_id, u.channel_id]) |> WeexChat.Repo.all()
+[debug] QUERY OK source="users_channels" db=1.8ms idle=1880.2ms
+SELECT u0."user_id", u0."channel_id" FROM "users_channels" AS u0 []
+↳ anonymous fn/4 in :elixir.eval_external_handler/1, at: src/elixir.erl:309
+
+iex> Ecto.Adapters.SQL.query(WeexChat.Repo, "INSERT INTO users_channels (user_id, channel_id) VALUES (2, 2)")
+[debug] QUERY OK db=5.9ms queue=0.7ms idle=1369.8ms
+INSERT INTO users_channels (user_id, channel_id) VALUES (2, 2) []
+{:ok,
+ %Postgrex.Result{
+   command: :insert,
+   columns: nil,
+   rows: nil,
+   num_rows: 1,
+   connection_id: 1419,
+   messages: []
+ }}
+
+iex> from(u in "users_channels", select: [u.user_id, u.channel_id]) |> WeexChat.Repo.all()
+[debug] QUERY OK source="users_channels" db=1.5ms idle=1088.7ms
+SELECT u0."user_id", u0."channel_id" FROM "users_channels" AS u0 []
+↳ anonymous fn/4 in :elixir.eval_external_handler/1, at: src/elixir.erl:309
+[[2, 2]]
+```
+
 Start the Phoenix server
 
 - Run `mix setup` to install and setup dependencies
