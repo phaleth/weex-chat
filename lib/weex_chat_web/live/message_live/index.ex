@@ -21,9 +21,24 @@ defmodule WeexChatWeb.MessageLive.Index do
 
     user = socket.assigns[:current_user]
 
+    first_channel_be_active = fn idx, channel ->
+      if idx === 0,
+        do: Map.put(channel, :active, true),
+        else: channel
+    end
+
     channels =
       if user,
-        do: Accounts.get_user!(user.id).channels,
+        do:
+          Accounts.get_user!(user.id).channels
+          |> Enum.with_index()
+          |> Enum.map(fn {channel, idx} ->
+            Map.put(
+              first_channel_be_active.(idx, channel),
+              :index,
+              idx
+            )
+          end),
         else: []
 
     {:ok,

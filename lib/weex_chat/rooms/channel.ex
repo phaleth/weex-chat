@@ -8,6 +8,8 @@ defmodule WeexChat.Rooms.Channel do
     field :creator_id, :id
     field :member_id, :id
     field :user_is_guest, :boolean, default: false
+    field :index, :integer, virtual: true
+    field :active, :boolean, virtual: true, default: false
     many_to_many :users, WeexChat.Accounts.User, join_through: "users_channels"
 
     timestamps()

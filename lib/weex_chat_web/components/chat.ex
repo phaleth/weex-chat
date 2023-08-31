@@ -24,50 +24,14 @@ defmodule WeexChatWeb.Components.Chat do
             <div class="w-6 text-right text-green-400 dark:text-lime-700"></div>
             <div class=" text-gray-700 dark:text-gray-400">weexchat</div>
           </div>
-          <div class="flex gap-5">
-            <div class="w-6 text-right text-green-400 dark:text-lime-700">2.</div>
-            <div>#redacted</div>
-          </div>
-          <div class="flex gap-5">
-            <div class="w-6 text-right text-green-400 dark:text-lime-700">3.</div>
-            <div>#redacted</div>
-          </div>
-          <div class="flex gap-5">
-            <div class="w-6 text-right text-green-400 dark:text-lime-700">4.</div>
-            <div class="text-gray-700 dark:text-gray-400">#redacted</div>
-          </div>
-          <div class="flex gap-5">
-            <div class="w-6 text-right text-green-400 dark:text-lime-700">5.</div>
-            <div class="text-gray-700 dark:text-gray-400">#redacted</div>
-          </div>
-          <div class="flex gap-5">
-            <div class="w-6 text-right text-green-400 dark:text-lime-700">6.</div>
-            <div>#redacted</div>
-          </div>
-          <div class="flex gap-5">
-            <div class="w-6 text-right text-green-400 dark:text-lime-700">7.</div>
-            <div>#redacted</div>
-          </div>
-          <div class="flex gap-5">
-            <div class="w-6 text-right text-green-400 dark:text-lime-700">8.</div>
-            <div>#redacted</div>
-          </div>
-          <div class="flex gap-5 bg-green-500 dark:bg-blue-700 text-gray-700 dark:text-gray-400">
-            <div class="w-6 text-right text-green-400 dark:text-lime-700">9.</div>
-            <div>#lfe</div>
-          </div>
-          <div class="flex gap-5">
-            <div class="w-6 text-right text-green-400 dark:text-lime-700">10.</div>
-            <div>#redacted</div>
-          </div>
-          <div class="flex gap-5">
-            <div class="w-6 text-right text-green-400 dark:text-lime-700">11.</div>
-            <div class="text-gray-700 dark:text-gray-400">#redacted</div>
-          </div>
-          <div class="flex gap-5">
-            <div class="w-6 text-right text-green-400 dark:text-lime-700">12.</div>
-            <div>#redacted</div>
-          </div>
+          <%= for {id, channel} <- @streams.channels do %>
+            <div class={"flex gap-5" <> if(channel.active, do: " bg-green-500 dark:bg-blue-700 text-gray-700 dark:text-gray-400", else: "")}>
+              <div class="w-6 text-right text-green-400 dark:text-lime-700">
+                <%= channel.index + 2 %>.
+              </div>
+              <div id={id}><%= channel.name %></div>
+            </div>
+          <% end %>
         </div>
       </div>
       <div class="flex-auto w-full px-1">
