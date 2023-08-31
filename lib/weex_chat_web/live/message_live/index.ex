@@ -134,9 +134,14 @@ defmodule WeexChatWeb.MessageLive.Index do
   end
 
   @impl true
-  def handle_event("mod-msg", %{"id" => "mod-messages-" <> id, "msg" => msg}, socket) do
+  def handle_event("mod-msg", %{"id" => "mod-messages-" <> id, "value" => msg}, socket) do
     IO.puts(id)
     IO.puts(msg)
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("msg-edit-submit", _params, socket) do
     {:noreply, socket}
   end
 

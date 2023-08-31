@@ -1,3 +1,10 @@
+const submitForm = (el) => {
+  el.form.dispatchEvent(
+    new Event("submit", { bubbles: true, cancelable: true })
+  );
+  el.value = "";
+};
+
 export default hooks = {
   ping: {
     mounted() {
@@ -31,12 +38,7 @@ export default hooks = {
   msgSubmit: {
     mounted() {
       this.el.addEventListener("keydown", (e) => {
-        if (e.key == "Enter") {
-          this.el.form.dispatchEvent(
-            new Event("submit", { bubbles: true, cancelable: true })
-          );
-          this.el.value = "";
-        }
+        if (e.key == "Enter") submitForm(this.el);
       });
     },
   },
@@ -45,7 +47,7 @@ export default hooks = {
       this.el.addEventListener("click", () => {
         let textEl = this.el.previousElementSibling;
         const priorTextHTML = textEl.outerHTML;
-        const formHTML = `<form class="flex-none" id="mod-msg-form" phx-submit="mod-msg">
+        const formHTML = `<form class="flex-none" id="mod-msg-form" phx-submit="msg-edit-submit">
           <span class="wxch-hide absolute overflow-hidden whitespace-pre"></span>
           <input
             class="wxch-remove-box-shadow px-0 h-5 border-none bg-gray-200 dark:bg-black
@@ -53,10 +55,10 @@ export default hooks = {
               font-mono text-sm"
             aria-label="Edit message"
             type="text"
-            id=${this.el.id}
+            phx-value-id=${this.el.id}
             name="msg"
             value="${textEl.textContent}"
-            phx-hook="msgSubmit"
+            phx-blur="mod-msg"
             />
           <input type="hidden" name="id" value=${this.el.id} />
         </form>`;
