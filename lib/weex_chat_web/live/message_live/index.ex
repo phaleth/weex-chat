@@ -161,9 +161,8 @@ defmodule WeexChatWeb.MessageLive.Index do
   end
 
   @impl true
-  def handle_event("del-msg", %{"id" => "messages-" <> id}, socket) do
-    IO.puts(id)
-    {:noreply, socket}
+  def handle_event("del-msg", %{"id" => id}, socket) do
+    {:noreply, socket |> stream_delete_by_dom_id(:messages, id)}
   end
 
   defp create_channel_by_name(socket, channel_name, user_id) do
