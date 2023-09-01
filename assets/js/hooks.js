@@ -35,6 +35,11 @@ export default hooks = {
       });
     },
   },
+  setupLists: {
+    mounted() {
+      this.pushEvent("setup-lists", {});
+    },
+  },
   msgSubmit: {
     mounted() {
       this.el.addEventListener("keydown", (e) => {

@@ -15,37 +15,13 @@ defmodule WeexChatWeb.MessageLive.Index do
   def mount(_params, _session, socket) do
     is_connected = connected?(socket)
 
-    if is_connected do
-      Process.send_after(self(), :tick, @one_second)
-    end
-
-    user = socket.assigns[:current_user]
-
-    first_channel_be_active = fn idx, channel ->
-      if idx === 0,
-        do: Map.put(channel, :active, true),
-        else: channel
-    end
-
-    channels =
-      if user,
-        do:
-          Accounts.get_user!(user.id).channels
-          |> Enum.with_index()
-          |> Enum.map(fn {channel, idx} ->
-            Map.put(
-              first_channel_be_active.(idx, channel),
-              :index,
-              idx
-            )
-          end),
-        else: []
+    if is_connected, do: Process.send_after(self(), :tick, @one_second)
 
     {:ok,
      socket
      |> assign(loading: !is_connected, offset: 0)
      |> stream(:messages, [])
-     |> stream(:channels, channels), layout: false}
+     |> assign(:channels, []), layout: false}
   end
 
   @impl true
@@ -91,11 +67,38 @@ defmodule WeexChatWeb.MessageLive.Index do
   end
 
   @impl true
-  def handle_event("delete", %{"id" => id}, socket) do
-    message = Chat.get_message!(id)
-    {:ok, _} = Chat.delete_message(message)
+  def handle_event("setup-lists", _params, socket) do
+    messages = Color.list_messages()
+    last_msg = List.last(messages)
+    newest_message_id = if is_nil(last_msg), do: 0, else: last_msg.id
 
-    {:noreply, stream_delete(socket, :messages, message)}
+    user = socket.assigns[:current_user]
+
+    first_channel_be_active = fn idx, channel ->
+      if idx === 0,
+        do: Map.put(channel, :active, true),
+        else: channel
+    end
+
+    channels =
+      if user,
+        do:
+          Accounts.get_user!(user.id).channels
+          |> Enum.with_index()
+          |> Enum.map(fn {channel, idx} ->
+            Map.put(
+              first_channel_be_active.(idx, channel),
+              :index,
+              idx
+            )
+          end),
+        else: []
+
+    {:noreply,
+     socket
+     |> assign(:newest_message_id, newest_message_id)
+     |> stream(:messages, messages)
+     |> assign(:channels, channels)}
   end
 
   @impl true
@@ -105,14 +108,9 @@ defmodule WeexChatWeb.MessageLive.Index do
 
   @impl true
   def handle_event("time-zone", %{"offset" => offset}, socket) do
-    messages = Color.list_messages()
-    last_msg = List.last(messages)
-    newest_message_id = if is_nil(last_msg), do: 0, else: last_msg.id
-
     {:noreply,
      socket
-     |> assign(offset: offset, newest_message_id: newest_message_id)
-     |> stream(:messages, messages)}
+     |> assign(:offset, offset)}
   end
 
   @impl true
@@ -165,14 +163,26 @@ defmodule WeexChatWeb.MessageLive.Index do
     {:noreply, socket |> stream_delete_by_dom_id(:messages, id)}
   end
 
+  @impl true
+  def handle_event("activate-chan", %{"id" => id}, socket) do
+    IO.puts(id)
+
+    channel = Enum.find(socket.assigns.channels, & &1.active)
+    IO.puts(channel.name)
+    {:noreply, socket}
+  end
+
   defp create_channel_by_name(socket, channel_name, user_id) do
     case Rooms.create_channel(%{
            name: channel_name,
+           creator_id: user_id,
            user_is_guest: is_nil(user_id)
          }) do
       {:ok, channel} ->
+        channels = socket.assigns.channels
+
         socket
-        |> stream_insert(:channels, channel)
+        |> assign(:channels, channels ++ [Map.put(channel, :index, length(channels))])
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {_, error} = List.first(changeset.errors)
@@ -197,7 +207,12 @@ defmodule WeexChatWeb.MessageLive.Index do
   @impl true
   def render(assigns) do
     ~H"""
-    <.chat loading={assigns.loading} offset={assigns.offset} streams={assigns.streams} />
+    <.chat
+      loading={assigns.loading}
+      offset={assigns.offset}
+      streams={assigns.streams}
+      channels={assigns.channels}
+    />
     """
   end
 end

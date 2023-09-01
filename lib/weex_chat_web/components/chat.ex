@@ -3,9 +3,10 @@ defmodule WeexChatWeb.Components.Chat do
   use Phoenix.Component
   alias Phoenix.LiveView.JS
 
-  attr(:loading, :boolean)
-  attr(:offset, :integer)
-  attr(:streams, :any)
+  attr :loading, :boolean
+  attr :offset, :integer
+  attr :streams, :any
+  attr :channels, WeexChat.Rooms.Channel
 
   def chat(assigns) do
     ~H"""
@@ -14,7 +15,11 @@ defmodule WeexChatWeb.Components.Chat do
         <div class="wxch-chans-ico-hamburger">&#9776;</div>
         <div class="wxch-chans-ico-close hidden">&#128473;</div>
       </button>
-      <div class="wxch-chans-list hidden sm:block flex-none w-auto max-h-40 sm:max-h-screen px-1 border-b-2 sm:border-b-0 sm:border-r-2 border-green-500 dark:border-sky-600 overflow-x-auto sm:overflow-x-hidden">
+      <div
+        phx-hook="setupLists"
+        id="setup-lists"
+        class="wxch-chans-list hidden sm:block flex-none w-auto max-h-40 sm:max-h-screen px-1 border-b-2 sm:border-b-0 sm:border-r-2 border-green-500 dark:border-sky-600 overflow-x-auto sm:overflow-x-hidden"
+      >
         <div class="grid grid-cols-1">
           <div class="flex gap-0.5">
             <div class="w-6 text-right text-green-400 dark:text-lime-700">1.</div>
@@ -24,14 +29,17 @@ defmodule WeexChatWeb.Components.Chat do
             <div class="w-6 text-right text-green-400 dark:text-lime-700"></div>
             <div class=" text-gray-700 dark:text-gray-400">weexchat</div>
           </div>
-          <%= for {id, channel} <- @streams.channels do %>
-            <div class={"flex gap-5" <> if(channel.active, do: " bg-green-500 dark:bg-blue-700 text-gray-700 dark:text-gray-400", else: "")}>
-              <div class="w-6 text-right text-green-400 dark:text-lime-700">
-                <%= channel.index + 2 %>.
-              </div>
-              <div id={id}><%= channel.name %></div>
+        </div>
+        <div :for={channel <- @channels} class="grid grid-cols-1" id="channels-container">
+          <div
+            phx-click={JS.push("activate-chan", value: %{id: channel.id})}
+            class={"flex gap-5" <> if(channel.active, do: " bg-green-500 dark:bg-blue-700 text-gray-700 dark:text-gray-400", else: "")}
+          >
+            <div class="w-6 text-right text-green-400 dark:text-lime-700">
+              <%= channel.index + 2 %>.
             </div>
-          <% end %>
+            <div><%= channel.name %></div>
+          </div>
         </div>
       </div>
       <div class="flex-auto w-full px-1">
