@@ -39,7 +39,7 @@ defmodule WeexChatWeb.Components.Chat do
               <div class="w-6 text-right text-green-400 dark:text-lime-700">
                 <%= channel.index + 2 %>.
               </div>
-              <div><%= channel.name %></div>
+              <div>#<%= channel.name %></div>
             </div>
           <% end %>
         </div>
