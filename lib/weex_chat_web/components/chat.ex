@@ -34,6 +34,8 @@ defmodule WeexChatWeb.Components.Chat do
           <%= for channel <- @channels do %>
             <div
               phx-click={JS.push("activate-chan", value: %{id: channel.id})}
+              id={"connect-#{channel.id}"}
+              phx-hook="confetti"
               class={"flex gap-5 cursor-pointer" <> if(channel.active, do: " bg-green-500 dark:bg-blue-700 text-gray-700 dark:text-gray-400", else: "")}
             >
               <div class="w-6 text-right text-green-400 dark:text-lime-700">

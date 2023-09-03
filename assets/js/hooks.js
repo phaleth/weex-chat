@@ -1,3 +1,5 @@
+import { confettiExplosion } from "./confetti";
+
 const submitForm = (el) => {
   el.form.dispatchEvent(
     new Event("submit", { bubbles: true, cancelable: true })
@@ -111,6 +113,14 @@ export default hooks = {
         from.remove();
         time.remove();
       });
+    },
+  },
+  confetti: {
+    mounted() {
+      this.el.addEventListener("click", () => confettiExplosion());
+    },
+    destroyed() {
+      this.el.removeEventListener("click", () => confettiExplosion());
     },
   },
 };
