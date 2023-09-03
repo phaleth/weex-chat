@@ -78,4 +78,4 @@ class Message {
   }
 }
 
-export default message = new Message();
+export default new Message();

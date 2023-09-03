@@ -1,7 +1,7 @@
 import message from "./message";
 import confetti from "./confetti";
 
-export default hooks = {
+export default {
   ping: {
     mounted() {
       let count = 0;
