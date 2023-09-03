@@ -8,13 +8,19 @@ class Confetti {
     Confetti._instance = this;
 
     this.confetti = new JSConfetti();
+
+    this.opts = {
+      confettiRadius: 5,
+      confettiNumber: 300,
+    };
+
+    this.priorTarget = null;
+  }
+
+  explosion(e) {
+    if (e.target !== this.priorTarget) this.confetti.addConfetti(this.opts);
+    this.priorTarget = e.target;
   }
 }
 
-export const confettiExplosion = () => {
-  const confetti = new Confetti().confetti;
-  confetti.addConfetti({
-    confettiRadius: 5,
-    confettiNumber: 300,
-  });
-};
+export default confetti = new Confetti();
