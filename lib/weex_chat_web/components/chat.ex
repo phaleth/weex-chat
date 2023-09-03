@@ -21,7 +21,7 @@ defmodule WeexChatWeb.Components.Chat do
         class="wxch-chans-list hidden sm:block flex-none w-auto max-h-40 sm:max-h-screen px-1 border-b-2 sm:border-b-0 sm:border-r-2 border-green-500 dark:border-sky-600 overflow-x-auto sm:overflow-x-hidden"
       >
         <div class="grid grid-cols-1">
-          <div class="flex gap-0.5">
+          <div class="flex gap-0.5 cursor-pointer">
             <div class="w-6 text-right text-green-400 dark:text-lime-700">1.</div>
             <div class="text-red-800 dark:text-indigo-600">network</div>
           </div>
@@ -30,16 +30,18 @@ defmodule WeexChatWeb.Components.Chat do
             <div class=" text-gray-700 dark:text-gray-400">weexchat</div>
           </div>
         </div>
-        <div :for={channel <- @channels} class="grid grid-cols-1" id="channels-container">
-          <div
-            phx-click={JS.push("activate-chan", value: %{id: channel.id})}
-            class={"flex gap-5" <> if(channel.active, do: " bg-green-500 dark:bg-blue-700 text-gray-700 dark:text-gray-400", else: "")}
-          >
-            <div class="w-6 text-right text-green-400 dark:text-lime-700">
-              <%= channel.index + 2 %>.
+        <div class="grid grid-cols-1" id="channels-container">
+          <%= for channel <- @channels do %>
+            <div
+              phx-click={JS.push("activate-chan", value: %{id: channel.id})}
+              class={"flex gap-5 cursor-pointer" <> if(channel.active, do: " bg-green-500 dark:bg-blue-700 text-gray-700 dark:text-gray-400", else: "")}
+            >
+              <div class="w-6 text-right text-green-400 dark:text-lime-700">
+                <%= channel.index + 2 %>.
+              </div>
+              <div><%= channel.name %></div>
             </div>
-            <div><%= channel.name %></div>
-          </div>
+          <% end %>
         </div>
       </div>
       <div class="flex-auto w-full px-1">
@@ -56,40 +58,42 @@ defmodule WeexChatWeb.Components.Chat do
               id="messages-container"
             >
               <%= for {id, message} <- @streams.messages do %>
-                <div class="pr-1">
-                  <%= if !@loading do %>
-                    <span>
-                      <%= DateTime.from_naive!(message.inserted_at, "Etc/UTC")
-                      |> DateTime.add(@offset, :hour)
-                      |> Calendar.strftime("%H:%M") %>
+                <%= if String.length(message.content) > 0 do %>
+                  <div class="pr-1">
+                    <%= if !@loading do %>
+                      <span>
+                        <%= DateTime.from_naive!(message.inserted_at, "Etc/UTC")
+                        |> DateTime.add(@offset, :hour)
+                        |> Calendar.strftime("%H:%M") %>
+                      </span>
+                    <% end %>
+                  </div>
+                  <div
+                    class={"px-1 text-right" <> if(message.from == "ℹ", do: " pr-3", else: "")}
+                    style={"color: #{message.from_color};"}
+                  >
+                    <%= message.from %>
+                  </div>
+                  <div class="px-1 text-green-600 dark:text-lime-400">╡</div>
+                  <div class="flex group">
+                    <span class="flex-none"><%= message.content %></span>
+                    <span
+                      id={"mod-#{id}"}
+                      phx-hook="modMsg"
+                      class="flex-none ml-2 hidden group-hover:inline cursor-pointer text-lime-200"
+                    >
+                      &#128393;
                     </span>
-                  <% end %>
-                </div>
-                <div
-                  class={"px-1 text-right" <> if(message.from == "ℹ", do: " pr-3", else: "")}
-                  style={"color: #{message.from_color};"}
-                >
-                  <%= message.from %>
-                </div>
-                <div class="px-1 text-green-600 dark:text-lime-400">╡</div>
-                <div class="flex group" id={id}>
-                  <span class="flex-none"><%= message.content %></span>
-                  <span
-                    id={"mod-#{id}"}
-                    phx-hook="modMsg"
-                    class="flex-none ml-2 hidden group-hover:inline cursor-pointer text-lime-200"
-                  >
-                    &#128393;
-                  </span>
-                  <span
-                    id={"del-#{id}"}
-                    phx-click={JS.push("del-msg", value: %{id: id})}
-                    phx-hook="delMsg"
-                    class="flex-none ml-2 hidden group-hover:inline cursor-pointer"
-                  >
-                    &#10060;
-                  </span>
-                </div>
+                    <span
+                      id={"del-#{id}"}
+                      phx-click={JS.push("del-msg", value: %{id: id})}
+                      phx-hook="delMsg"
+                      class="flex-none ml-2 hidden group-hover:inline cursor-pointer"
+                    >
+                      &#10060;
+                    </span>
+                  </div>
+                <% end %>
               <% end %>
             </div>
           </div>

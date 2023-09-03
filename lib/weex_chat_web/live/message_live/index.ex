@@ -74,11 +74,10 @@ defmodule WeexChatWeb.MessageLive.Index do
 
     user = socket.assigns[:current_user]
 
-    first_channel_be_active = fn idx, channel ->
-      if idx === 0,
-        do: Map.put(channel, :active, true),
-        else: channel
-    end
+    first_channel_be_active =
+      &if &1 === 0,
+        do: Map.put(&2, :active, true),
+        else: &2
 
     channels =
       if user,
@@ -154,7 +153,7 @@ defmodule WeexChatWeb.MessageLive.Index do
   end
 
   @impl true
-  def handle_event("msg-edit-submit", _params, socket) do
+  def handle_event("msg-mod-submit", _params, socket) do
     {:noreply, socket}
   end
 
@@ -165,11 +164,23 @@ defmodule WeexChatWeb.MessageLive.Index do
 
   @impl true
   def handle_event("activate-chan", %{"id" => id}, socket) do
-    IO.puts(id)
+    channels = socket.assigns.channels
 
-    channel = Enum.find(socket.assigns.channels, & &1.active)
-    IO.puts(channel.name)
-    {:noreply, socket}
+    change_channel =
+      &cond do
+        &1.active -> Map.put(&1, :active, false)
+        &1.id === id -> Map.put(&1, :active, true)
+        true -> &1
+      end
+
+    channels =
+      if Enum.find(channels, & &1.active).id === id do
+        channels
+      else
+        Enum.map(channels, &change_channel.(&1))
+      end
+
+    {:noreply, socket |> assign(:channels, channels) |> stream(:messages, [], reset: true)}
   end
 
   defp create_channel_by_name(socket, channel_name, user_id) do

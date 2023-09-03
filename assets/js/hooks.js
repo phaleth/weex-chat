@@ -52,7 +52,7 @@ export default hooks = {
       this.el.addEventListener("click", () => {
         let textEl = this.el.previousElementSibling;
         const priorTextHTML = textEl.outerHTML;
-        const formHTML = `<form class="flex-none" id="mod-msg-form" phx-submit="msg-edit-submit">
+        const formHTML = `<form class="flex-none" id="mod-msg-form" phx-submit="msg-mod-submit">
           <span class="wxch-hide absolute overflow-hidden whitespace-pre"></span>
           <input
             class="wxch-remove-box-shadow px-0 h-5 border-none bg-gray-200 dark:bg-black
