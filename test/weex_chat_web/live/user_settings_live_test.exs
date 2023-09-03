@@ -45,7 +45,7 @@ defmodule WeexChatWeb.UserSettingsLiveTest do
         })
         |> render_submit()
 
-      assert result =~ "A link to confirm your email"
+      assert result =~ "Current password"
       assert Accounts.get_user_by_email(user.email)
     end
 

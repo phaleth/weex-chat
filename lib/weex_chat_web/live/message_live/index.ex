@@ -228,7 +228,9 @@ defmodule WeexChatWeb.MessageLive.Index do
   defp maybe_exec_channel_command(socket, channel, user_id, callback) do
     words = String.split(channel, " ", trim: true)
 
-    if length(words) === 1, do: callback.(socket, List.first(words), user_id)
+    if length(words) === 1,
+      do: callback.(socket, List.first(words), user_id),
+      else: socket |> put_flash(:error, "Provide just a single argument")
   end
 
   defp exec_create_command(socket, msg, user_id) do
@@ -237,7 +239,7 @@ defmodule WeexChatWeb.MessageLive.Index do
         maybe_exec_channel_command(socket, channel, user_id, &create_channel_by_name/3)
 
       _ ->
-        socket
+        socket |> put_flash(:error, "Incorrect create command call.")
     end
   end
 
@@ -247,7 +249,7 @@ defmodule WeexChatWeb.MessageLive.Index do
         maybe_exec_channel_command(socket, channel, user_id, &join_channel_by_name/3)
 
       _ ->
-        socket
+        socket |> put_flash(:error, "Incorrect join command call.")
     end
   end
 
