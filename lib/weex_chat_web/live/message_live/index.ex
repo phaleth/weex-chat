@@ -3,7 +3,6 @@ defmodule WeexChatWeb.MessageLive.Index do
 
   import WeexChatWeb.Components.Chat
 
-  alias WeexChat.Chat
   alias WeexChat.Chat.Message
   alias WeexChat.Chat.Services.Color
   alias WeexChat.Accounts
@@ -25,31 +24,8 @@ defmodule WeexChatWeb.MessageLive.Index do
   end
 
   @impl true
-  def handle_params(params, _url, socket) do
-    {:noreply, apply_action(socket, socket.assigns.live_action, params)}
-  end
-
-  defp apply_action(socket, :edit, %{"id" => id}) do
-    socket
-    |> assign(:page_title, "Edit Message")
-    |> assign(:message, Chat.get_message!(id))
-  end
-
-  defp apply_action(socket, :new, _params) do
-    socket
-    |> assign(:page_title, "New Message")
-    |> assign(:message, %Message{})
-  end
-
-  defp apply_action(socket, :index, _params) do
-    socket
-    |> assign(:page_title, "weexchat")
-    |> assign(:message, nil)
-  end
-
-  @impl true
-  def handle_info({WeexChatWeb.MessageLive.FormComponent, {:saved, message}}, socket) do
-    {:noreply, stream_insert(socket, :messages, message)}
+  def handle_params(_params, _url, %{assigns: %{live_action: :index}} = socket) do
+    {:noreply, socket |> assign(:page_title, "weexchat")}
   end
 
   @impl true
@@ -172,11 +148,9 @@ defmodule WeexChatWeb.MessageLive.Index do
     channels = socket.assigns.channels
 
     channels =
-      if Enum.find(channels, & &1.active).id === id do
-        channels
-      else
-        change_channel(channels, id)
-      end
+      if Enum.find(channels, & &1.active).id === id,
+        do: channels,
+        else: change_channel(channels, id)
 
     {:noreply, socket |> assign(:channels, channels) |> stream(:messages, [], reset: true)}
   end
@@ -192,13 +166,13 @@ defmodule WeexChatWeb.MessageLive.Index do
     )
   end
 
-  defp activate_channel(socket, channel, user_id) do
+  defp activate_channel(channels, channel, user_id) do
     Ecto.Adapters.SQL.query(
       WeexChat.Repo,
       "INSERT INTO users_channels (user_id, channel_id) VALUES (#{user_id}, #{channel.id})"
     )
 
-    (socket.assigns.channels ++ [Map.put(channel, :index, length(socket.assigns.channels))])
+    (channels ++ [Map.put(channel, :index, length(channels))])
     |> change_channel(channel.id)
   end
 
@@ -210,7 +184,7 @@ defmodule WeexChatWeb.MessageLive.Index do
          }) do
       {:ok, channel} ->
         socket
-        |> assign(:channels, activate_channel(socket, channel, user_id))
+        |> assign(:channels, activate_channel(socket.assigns.channels, channel, user_id))
         |> push_event("hooray", %{})
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -223,7 +197,7 @@ defmodule WeexChatWeb.MessageLive.Index do
     channel = Rooms.get_channel!(channel_name)
 
     socket
-    |> assign(:channels, activate_channel(socket, channel, user_id))
+    |> assign(:channels, activate_channel(socket.assigns.channels, channel, user_id))
   end
 
   defp maybe_exec_channel_command(socket, channel, user_id, callback) do
