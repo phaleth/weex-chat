@@ -35,9 +35,20 @@ defmodule WeexChat.Rooms do
       iex> get_channel!(456)
       ** (Ecto.NoResultsError)
 
+      iex> get_channel!("elixir")
+      %Channel{}
+
+      iex> get_channel!("gleam")
+      ** (Ecto.NoResultsError)
+
   """
-  def get_channel!(id) do
+  def get_channel!(id) when is_number(id) do
     from(ch in Channel, where: ch.id == ^id, preload: [:users])
+    |> Repo.one!()
+  end
+
+  def get_channel!(name) when is_binary(name) do
+    from(ch in Channel, where: ch.name == ^name, preload: [:users])
     |> Repo.one!()
   end
 

@@ -122,24 +122,29 @@ defmodule WeexChatWeb.MessageLive.Index do
         else: {nil, "Anonymous"}
 
     socket =
-      if String.starts_with?(msg, "/create ") do
-        exec_create_command(socket, msg, user_id)
-      else
-        new_msg_id = socket.assigns.newest_message_id + 1
+      cond do
+        String.starts_with?(msg, "/create ") ->
+          exec_create_command(socket, msg, user_id)
 
-        message =
-          %Message{
-            id: new_msg_id,
-            user_id: user_id,
-            from: username,
-            content: msg,
-            inserted_at: DateTime.utc_now()
-          }
-          |> Map.put(:from_color, WeexChat.Generators.Color.get(username))
+        String.starts_with?(msg, "/join ") ->
+          exec_join_command(socket, msg, user_id)
 
-        socket
-        |> assign(:newest_message_id, new_msg_id)
-        |> stream_insert(:messages, message)
+        true ->
+          new_msg_id = socket.assigns.newest_message_id + 1
+
+          message =
+            %Message{
+              id: new_msg_id,
+              user_id: user_id,
+              from: username,
+              content: msg,
+              inserted_at: DateTime.utc_now()
+            }
+            |> Map.put(:from_color, WeexChat.Generators.Color.get(username))
+
+          socket
+          |> assign(:newest_message_id, new_msg_id)
+          |> stream_insert(:messages, message)
       end
 
     {:noreply, socket}
@@ -166,21 +171,35 @@ defmodule WeexChatWeb.MessageLive.Index do
   def handle_event("activate-chan", %{"id" => id}, socket) do
     channels = socket.assigns.channels
 
-    change_channel =
-      &cond do
-        &1.active -> Map.put(&1, :active, false)
-        &1.id === id -> Map.put(&1, :active, true)
-        true -> &1
-      end
-
     channels =
       if Enum.find(channels, & &1.active).id === id do
         channels
       else
-        Enum.map(channels, &change_channel.(&1))
+        change_channel(channels, id)
       end
 
     {:noreply, socket |> assign(:channels, channels) |> stream(:messages, [], reset: true)}
+  end
+
+  defp change_channel(channels, target_id) do
+    Enum.map(
+      channels,
+      &cond do
+        &1.active -> Map.put(&1, :active, false)
+        &1.id === target_id -> Map.put(&1, :active, true)
+        true -> &1
+      end
+    )
+  end
+
+  defp activate_channel(socket, channel, user_id) do
+    Ecto.Adapters.SQL.query(
+      WeexChat.Repo,
+      "INSERT INTO users_channels (user_id, channel_id) VALUES (#{user_id}, #{channel.id})"
+    )
+
+    (socket.assigns.channels ++ [Map.put(channel, :index, length(socket.assigns.channels))])
+    |> change_channel(channel.id)
   end
 
   defp create_channel_by_name(socket, channel_name, user_id) do
@@ -190,15 +209,8 @@ defmodule WeexChatWeb.MessageLive.Index do
            user_is_guest: is_nil(user_id)
          }) do
       {:ok, channel} ->
-        Ecto.Adapters.SQL.query(
-          WeexChat.Repo,
-          "INSERT INTO users_channels (user_id, channel_id) VALUES (#{user_id}, #{channel.id})"
-        )
-
-        channels = socket.assigns.channels
-
         socket
-        |> assign(:channels, channels ++ [Map.put(channel, :index, length(channels))])
+        |> assign(:channels, activate_channel(socket, channel, user_id))
         |> push_event("hooray", %{})
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -207,14 +219,33 @@ defmodule WeexChatWeb.MessageLive.Index do
     end
   end
 
+  defp join_channel_by_name(socket, channel_name, user_id) do
+    channel = Rooms.get_channel!(channel_name)
+
+    socket
+    |> assign(:channels, activate_channel(socket, channel, user_id))
+  end
+
+  defp maybe_exec_channel_command(socket, channel, user_id, callback) do
+    words = String.split(channel, " ", trim: true)
+
+    if length(words) === 1, do: callback.(socket, List.first(words), user_id)
+  end
+
   defp exec_create_command(socket, msg, user_id) do
     case msg do
       "/create " <> channel ->
-        words = String.split(channel, " ", trim: true)
+        maybe_exec_channel_command(socket, channel, user_id, &create_channel_by_name/3)
 
-        if length(words) === 1 do
-          create_channel_by_name(socket, List.first(words), user_id)
-        end
+      _ ->
+        socket
+    end
+  end
+
+  defp exec_join_command(socket, msg, user_id) do
+    case msg do
+      "/join " <> channel ->
+        maybe_exec_channel_command(socket, channel, user_id, &join_channel_by_name/3)
 
       _ ->
         socket
