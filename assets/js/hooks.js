@@ -34,6 +34,9 @@ export default {
   setupLists: {
     mounted() {
       this.pushEvent("setup-lists", {});
+      this.handleEvent("hooray", () => {
+        confetti.explosion();
+      });
     },
   },
   msgSubmit: {
@@ -58,14 +61,6 @@ export default {
     },
     destroyed() {
       this.el.removeEventListener("click", (e) => message.delete(e));
-    },
-  },
-  confetti: {
-    mounted() {
-      this.el.addEventListener("click", (e) => confetti.explosion(e));
-    },
-    destroyed() {
-      this.el.removeEventListener("click", (e) => confetti.explosion(e));
     },
   },
 };

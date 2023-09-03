@@ -190,10 +190,16 @@ defmodule WeexChatWeb.MessageLive.Index do
            user_is_guest: is_nil(user_id)
          }) do
       {:ok, channel} ->
+        Ecto.Adapters.SQL.query(
+          WeexChat.Repo,
+          "INSERT INTO users_channels (user_id, channel_id) VALUES (#{user_id}, #{channel.id})"
+        )
+
         channels = socket.assigns.channels
 
         socket
         |> assign(:channels, channels ++ [Map.put(channel, :index, length(channels))])
+        |> push_event("hooray", %{})
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {_, error} = List.first(changeset.errors)
