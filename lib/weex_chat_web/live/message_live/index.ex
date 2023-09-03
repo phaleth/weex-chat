@@ -20,7 +20,13 @@ defmodule WeexChatWeb.MessageLive.Index do
 
     {:ok,
      socket
-     |> assign(loading: !is_connected, offset: 0, user_id: user_id, user_name: user_name)
+     |> assign(
+       loading: !is_connected,
+       offset: 0,
+       user_id: user_id,
+       user_name: user_name,
+       active_channel_name: "n/a"
+     )
      |> stream(:messages, [])
      |> assign(:channels, []), layout: false}
   end
@@ -73,9 +79,12 @@ defmodule WeexChatWeb.MessageLive.Index do
 
     {:noreply,
      socket
-     |> assign(:newest_message_id, newest_message_id)
-     |> stream(:messages, messages)
-     |> assign(:channels, channels)}
+     |> assign(
+       newest_message_id: newest_message_id,
+       active_channel_name: get_active_channel_name(channels),
+       channels: channels
+     )
+     |> stream(:messages, messages)}
   end
 
   @impl true
@@ -150,7 +159,10 @@ defmodule WeexChatWeb.MessageLive.Index do
         do: channels,
         else: change_channel(channels, id)
 
-    {:noreply, socket |> assign(:channels, channels) |> stream(:messages, [], reset: true)}
+    {:noreply,
+     socket
+     |> assign(channels: channels, active_channel_name: get_active_channel_name(channels))
+     |> stream(:messages, [], reset: true)}
   end
 
   defp get_user_id_and_name(assigns) do
@@ -159,6 +171,10 @@ defmodule WeexChatWeb.MessageLive.Index do
     if user,
       do: {user.id, user.username},
       else: {nil, "Anonymous"}
+  end
+
+  defp get_active_channel_name(channels) do
+    Enum.find(channels, & &1.active).name
   end
 
   defp change_channel(channels, target_id) do
@@ -189,8 +205,10 @@ defmodule WeexChatWeb.MessageLive.Index do
            user_is_guest: is_nil(user_id)
          }) do
       {:ok, channel} ->
+        channels = activate_channel(socket.assigns.channels, channel, user_id)
+
         socket
-        |> assign(:channels, activate_channel(socket.assigns.channels, channel, user_id))
+        |> assign(channels: channels, active_channel_name: get_active_channel_name(channels))
         |> push_event("hooray", %{})
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -201,9 +219,10 @@ defmodule WeexChatWeb.MessageLive.Index do
 
   defp join_channel_by_name(socket, channel_name, user_id) do
     channel = Rooms.get_channel!(channel_name)
+    channels = activate_channel(socket.assigns.channels, channel, user_id)
 
     socket
-    |> assign(:channels, activate_channel(socket.assigns.channels, channel, user_id))
+    |> assign(channels: channels, active_channel_name: get_active_channel_name(channels))
   end
 
   defp maybe_exec_channel_command(socket, channel, user_id, callback) do
@@ -240,7 +259,8 @@ defmodule WeexChatWeb.MessageLive.Index do
       offset={assigns.offset}
       streams={assigns.streams}
       channels={assigns.channels}
-      username={assigns.user_name}
+      user_name={assigns.user_name}
+      active_channel_name={assigns.active_channel_name}
     />
     """
   end
