@@ -16,9 +16,11 @@ defmodule WeexChatWeb.MessageLive.Index do
 
     if is_connected, do: Process.send_after(self(), :tick, @one_second)
 
+    {user_id, user_name} = get_user_id_and_name(socket.assigns)
+
     {:ok,
      socket
-     |> assign(loading: !is_connected, offset: 0)
+     |> assign(loading: !is_connected, offset: 0, user_id: user_id, user_name: user_name)
      |> stream(:messages, [])
      |> assign(:channels, []), layout: false}
   end
@@ -48,17 +50,17 @@ defmodule WeexChatWeb.MessageLive.Index do
     last_msg = List.last(messages)
     newest_message_id = if is_nil(last_msg), do: 0, else: last_msg.id
 
-    user = socket.assigns[:current_user]
-
     first_channel_be_active =
       &if &1 === 0,
         do: Map.put(&2, :active, true),
         else: &2
 
+    user_id = socket.assigns.user_id
+
     channels =
-      if user,
+      if user_id,
         do:
-          Accounts.get_user!(user.id).channels
+          Accounts.get_user!(user_id).channels
           |> Enum.with_index()
           |> Enum.map(fn {channel, idx} ->
             Map.put(
@@ -90,12 +92,8 @@ defmodule WeexChatWeb.MessageLive.Index do
 
   @impl true
   def handle_event("new-msg", %{"msg" => msg}, socket) do
-    user = socket.assigns[:current_user]
-
-    {user_id, username} =
-      if user,
-        do: {user.id, user.username},
-        else: {nil, "Anonymous"}
+    user_id = socket.assigns.user_id
+    user_name = socket.assigns.user_name
 
     socket =
       cond do
@@ -112,11 +110,11 @@ defmodule WeexChatWeb.MessageLive.Index do
             %Message{
               id: new_msg_id,
               user_id: user_id,
-              from: username,
+              from: user_name,
               content: msg,
               inserted_at: DateTime.utc_now()
             }
-            |> Map.put(:from_color, WeexChat.Generators.Color.get(username))
+            |> Map.put(:from_color, WeexChat.Generators.Color.get(user_name))
 
           socket
           |> assign(:newest_message_id, new_msg_id)
@@ -153,6 +151,14 @@ defmodule WeexChatWeb.MessageLive.Index do
         else: change_channel(channels, id)
 
     {:noreply, socket |> assign(:channels, channels) |> stream(:messages, [], reset: true)}
+  end
+
+  defp get_user_id_and_name(assigns) do
+    user = assigns[:current_user]
+
+    if user,
+      do: {user.id, user.username},
+      else: {nil, "Anonymous"}
   end
 
   defp change_channel(channels, target_id) do
@@ -234,6 +240,7 @@ defmodule WeexChatWeb.MessageLive.Index do
       offset={assigns.offset}
       streams={assigns.streams}
       channels={assigns.channels}
+      username={assigns.user_name}
     />
     """
   end

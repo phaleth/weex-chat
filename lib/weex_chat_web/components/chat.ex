@@ -7,6 +7,7 @@ defmodule WeexChatWeb.Components.Chat do
   attr :offset, :integer
   attr :streams, :any
   attr :channels, WeexChat.Rooms.Channel
+  attr :username, :string
 
   def chat(assigns) do
     ~H"""
@@ -109,7 +110,7 @@ defmodule WeexChatWeb.Components.Chat do
               <span class="text-green-600 dark:text-yellow-200" id="ping" phx-hook="ping">-----</span><span class="text-purple-700 dark:text-cyan-700">]</span>
             </div>
             <div class="flex">
-              <span class="flex-none text-purple-700 dark:text-cyan-700">[</span><span class="text-indigo-500 dark:text-teal-500">phaleth</span><span class="text-purple-700 dark:text-cyan-700">(</span>Ziw<span class="text-purple-700 dark:text-cyan-700">)]</span>
+              <span class="flex-none text-purple-700 dark:text-cyan-700">[</span><span class="text-indigo-500 dark:text-teal-500"><%= @username %></span><span class="text-purple-700 dark:text-cyan-700">(</span>Ziw<span class="text-purple-700 dark:text-cyan-700">)]</span>
               <form class="flex-auto" id="msg-form" phx-submit="new-msg">
                 <input
                   class="wxch-remove-box-shadow pt-0 pb-1.5 px-1.5 h-5 w-full border-none bg-gray-200 dark:bg-black text-black dark:text-gray-300 placeholder-gray-600 dark:placeholder-gray-400 font-mono text-sm"
