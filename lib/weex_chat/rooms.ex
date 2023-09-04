@@ -23,6 +23,25 @@ defmodule WeexChat.Rooms do
   end
 
   @doc """
+  Returns the list of of user names for a channel.
+
+  ## Examples
+
+      iex> list_user_names("elixir")
+      ["user1", "user2", ...]
+
+  """
+  def list_user_names(name) do
+    channel =
+      from(ch in Channel, where: ch.name == ^name, preload: [:users])
+      |> Repo.one()
+
+    if channel && channel.users,
+      do: Enum.map(channel.users, & &1.username),
+      else: []
+  end
+
+  @doc """
   Gets a single channel.
 
   Raises `Ecto.NoResultsError` if the Channel does not exist.

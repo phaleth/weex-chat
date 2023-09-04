@@ -25,10 +25,11 @@ defmodule WeexChatWeb.MessageLive.Index do
        offset: 0,
        user_id: user_id,
        user_name: user_name,
-       active_channel_name: "n/a"
+       active_channel_name: "n/a",
+       channels: [],
+       user_names: []
      )
-     |> stream(:messages, [])
-     |> assign(:channels, []), layout: false}
+     |> stream(:messages, []), layout: false}
   end
 
   @impl true
@@ -57,13 +58,15 @@ defmodule WeexChatWeb.MessageLive.Index do
     newest_message_id = if is_nil(last_msg), do: 0, else: last_msg.id
 
     channels = setup_channels(socket.assigns)
+    channel_name = get_active_channel_name(channels)
 
     {:noreply,
      socket
      |> assign(
        newest_message_id: newest_message_id,
-       active_channel_name: get_active_channel_name(channels),
-       channels: channels
+       active_channel_name: channel_name,
+       channels: channels,
+       user_names: WeexChat.Rooms.list_user_names(channel_name)
      )
      |> stream(:messages, messages)}
   end
@@ -143,10 +146,16 @@ defmodule WeexChatWeb.MessageLive.Index do
         do: channels,
         else: change_channel(channels, id)
 
+    channel_name = get_active_channel_name(channels)
+
     {:noreply,
      socket
      |> push_event("clear-chat", %{})
-     |> assign(channels: channels, active_channel_name: get_active_channel_name(channels))
+     |> assign(
+       active_channel_name: channel_name,
+       channels: channels,
+       user_names: WeexChat.Rooms.list_user_names(channel_name)
+     )
      |> stream(:messages, [], reset: true)}
   end
 
@@ -215,9 +224,14 @@ defmodule WeexChatWeb.MessageLive.Index do
          }) do
       {:ok, channel} ->
         channels = activate_channel(socket.assigns.channels, channel, user_id)
+        channel_name = get_active_channel_name(channels)
 
         socket
-        |> assign(channels: channels, active_channel_name: get_active_channel_name(channels))
+        |> assign(
+          active_channel_name: channel_name,
+          channels: channels,
+          user_names: WeexChat.Rooms.list_user_names(channel_name)
+        )
         |> push_event("hooray", %{})
 
       {:error, %Ecto.Changeset{} = changeset} ->
@@ -231,7 +245,11 @@ defmodule WeexChatWeb.MessageLive.Index do
     channels = activate_channel(socket.assigns.channels, channel, user_id)
 
     socket
-    |> assign(channels: channels, active_channel_name: get_active_channel_name(channels))
+    |> assign(
+      active_channel_name: channel_name,
+      channels: channels,
+      user_names: WeexChat.Rooms.list_user_names(channel_name)
+    )
   end
 
   defp leave_channel_by_name(socket, channel_name, user_id) do
@@ -243,9 +261,14 @@ defmodule WeexChatWeb.MessageLive.Index do
     )
 
     channels = setup_channels(socket.assigns)
+    channel_name = get_active_channel_name(channels)
 
     socket
-    |> assign(channels: channels, active_channel_name: get_active_channel_name(channels))
+    |> assign(
+      active_channel_name: channel_name,
+      channels: channels,
+      user_names: WeexChat.Rooms.list_user_names(channel_name)
+    )
   end
 
   defp maybe_exec_channel_command(socket, channel, user_id, callback) do
@@ -296,6 +319,7 @@ defmodule WeexChatWeb.MessageLive.Index do
       channels={assigns.channels}
       user_name={assigns.user_name}
       active_channel_name={assigns.active_channel_name}
+      user_names={assigns.user_names}
     />
     """
   end

@@ -9,6 +9,7 @@ defmodule WeexChatWeb.Components.Chat do
   attr :channels, WeexChat.Rooms.Channel
   attr :user_name, :string
   attr :active_channel_name, :string
+  attr :user_names, :list
 
   def chat(assigns) do
     ~H"""
@@ -129,41 +130,19 @@ defmodule WeexChatWeb.Components.Chat do
       </div>
       <div class="wxch-users-list hidden sm:block flex-none w-auto max-h-40 sm:max-h-screen px-1 border-t-2 sm:border-t-0 sm:border-l-2 border-green-500 dark:border-sky-600 overflow-x-auto sm:overflow-x-hidden">
         <div class="flex">
-          <div class="text-green-400 dark:text-lime-700">@</div>
-          <div>ChanServ</div>
+          <%= if Enum.empty?(@user_names) do %>
+            <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+          <% else %>
+            <div class="text-green-400 dark:text-lime-700">@</div>
+            <div>ChanServ</div>
+          <% end %>
         </div>
-        <div class="flex gap-2">
-          <div></div>
-          <div>redacted</div>
-        </div>
-        <div class="flex gap-2">
-          <div></div>
-          <div>redacted</div>
-        </div>
-        <div class="flex gap-2">
-          <div></div>
-          <div>redacted</div>
-        </div>
-        <div class="flex gap-2">
-          <div></div>
-          <div>phaleth</div>
-        </div>
-        <div class="flex gap-2">
-          <div></div>
-          <div>redacted</div>
-        </div>
-        <div class="flex gap-2">
-          <div></div>
-          <div>redacted</div>
-        </div>
-        <div class="flex gap-2">
-          <div></div>
-          <div>redacted</div>
-        </div>
-        <div class="flex gap-2">
-          <div></div>
-          <div>redacted</div>
-        </div>
+        <%= for user_name <- @user_names do %>
+          <div class="flex gap-2">
+            <div></div>
+            <div><%= user_name %></div>
+          </div>
+        <% end %>
       </div>
       <button class="wxch-users-btn fixed bottom-2 right-2 sm:hidden text-2xl w-12 h-12 select-none bg-gray-400/40 dark:bg-slate-700/40 hover:bg-slate-800 focus:bg-slate-800 active:bg-slate-900 text-black dark:text-gray-300 flex flex-col justify-center items-center">
         <div class="wxch-users-ico-hamburger">&#9776;</div>
