@@ -174,7 +174,9 @@ defmodule WeexChatWeb.MessageLive.Index do
   end
 
   defp get_active_channel_name(channels) do
-    Enum.find(channels, & &1.active).name
+    if length(channels) === 0,
+      do: "n/a",
+      else: Enum.find(channels, & &1.active).name
   end
 
   defp change_channel(channels, target_id) do
