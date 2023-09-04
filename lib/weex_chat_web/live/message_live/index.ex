@@ -56,26 +56,7 @@ defmodule WeexChatWeb.MessageLive.Index do
     last_msg = List.last(messages)
     newest_message_id = if is_nil(last_msg), do: 0, else: last_msg.id
 
-    first_channel_be_active =
-      &if &1 === 0,
-        do: Map.put(&2, :active, true),
-        else: &2
-
-    user_id = socket.assigns.user_id
-
-    channels =
-      if user_id,
-        do:
-          Accounts.get_user!(user_id).channels
-          |> Enum.with_index()
-          |> Enum.map(fn {channel, idx} ->
-            Map.put(
-              first_channel_be_active.(idx, channel),
-              :index,
-              idx
-            )
-          end),
-        else: []
+    channels = setup_channels(socket.assigns)
 
     {:noreply,
      socket
@@ -111,6 +92,9 @@ defmodule WeexChatWeb.MessageLive.Index do
 
         String.starts_with?(msg, "/join ") ->
           exec_join_command(socket, msg, user_id)
+
+        String.starts_with?(msg, "/leave ") ->
+          exec_leave_command(socket, msg, user_id)
 
         true ->
           new_msg_id = socket.assigns.newest_message_id + 1
@@ -179,6 +163,28 @@ defmodule WeexChatWeb.MessageLive.Index do
       else: Enum.find(channels, & &1.active).name
   end
 
+  defp setup_channels(assigns) do
+    first_channel_be_active =
+      &if &1 === 0,
+        do: Map.put(&2, :active, true),
+        else: &2
+
+    user_id = assigns.user_id
+
+    if user_id,
+      do:
+        Accounts.get_user!(user_id).channels
+        |> Enum.with_index()
+        |> Enum.map(fn {channel, idx} ->
+          Map.put(
+            first_channel_be_active.(idx, channel),
+            :index,
+            idx
+          )
+        end),
+      else: []
+  end
+
   defp change_channel(channels, target_id) do
     Enum.map(
       channels,
@@ -215,13 +221,27 @@ defmodule WeexChatWeb.MessageLive.Index do
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {_, error} = List.first(changeset.errors)
-        socket |> put_flash(:error, error)
+        socket |> put_flash(:error, elem(error, 0))
     end
   end
 
   defp join_channel_by_name(socket, channel_name, user_id) do
     channel = Rooms.get_channel!(channel_name)
     channels = activate_channel(socket.assigns.channels, channel, user_id)
+
+    socket
+    |> assign(channels: channels, active_channel_name: get_active_channel_name(channels))
+  end
+
+  defp leave_channel_by_name(socket, channel_name, user_id) do
+    channel = Rooms.get_channel!(channel_name)
+
+    Ecto.Adapters.SQL.query(
+      WeexChat.Repo,
+      "DELETE FROM users_channels WHERE user_id = #{user_id} AND channel_id = #{channel.id}"
+    )
+
+    channels = setup_channels(socket.assigns)
 
     socket
     |> assign(channels: channels, active_channel_name: get_active_channel_name(channels))
@@ -252,6 +272,16 @@ defmodule WeexChatWeb.MessageLive.Index do
 
       _ ->
         socket |> put_flash(:error, "Incorrect join command call.")
+    end
+  end
+
+  defp exec_leave_command(socket, msg, user_id) do
+    case msg do
+      "/leave " <> channel ->
+        maybe_exec_channel_command(socket, channel, user_id, &leave_channel_by_name/3)
+
+      _ ->
+        socket |> put_flash(:error, "Incorrect leave command call.")
     end
   end
 
