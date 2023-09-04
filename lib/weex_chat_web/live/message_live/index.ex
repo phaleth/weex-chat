@@ -145,6 +145,7 @@ defmodule WeexChatWeb.MessageLive.Index do
 
     {:noreply,
      socket
+     |> push_event("clear-chat", %{})
      |> assign(channels: channels, active_channel_name: get_active_channel_name(channels))
      |> stream(:messages, [], reset: true)}
   end
@@ -158,7 +159,7 @@ defmodule WeexChatWeb.MessageLive.Index do
   end
 
   defp get_active_channel_name(channels) do
-    if length(channels) === 0,
+    if Enum.empty?(channels),
       do: "n/a",
       else: Enum.find(channels, & &1.active).name
   end

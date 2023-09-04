@@ -37,6 +37,12 @@ export default {
       this.handleEvent("hooray", () => {
         confetti.explosion();
       });
+      this.handleEvent("clear-chat", () => {
+        const container = document.getElementById("messages-container");
+        while (container.firstChild) {
+          container.removeChild(container.lastChild);
+        }
+      });
     },
   },
   msgSubmit: {

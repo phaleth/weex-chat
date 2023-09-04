@@ -132,35 +132,35 @@ defmodule WeexChatWeb.Components.Chat do
           <div class="text-green-400 dark:text-lime-700">@</div>
           <div>ChanServ</div>
         </div>
-        <div class="flex gap-4">
+        <div class="flex gap-2">
           <div></div>
           <div>redacted</div>
         </div>
-        <div class="flex gap-4">
+        <div class="flex gap-2">
           <div></div>
           <div>redacted</div>
         </div>
-        <div class="flex gap-4">
+        <div class="flex gap-2">
           <div></div>
           <div>redacted</div>
         </div>
-        <div class="flex gap-4">
+        <div class="flex gap-2">
           <div></div>
           <div>phaleth</div>
         </div>
-        <div class="flex gap-4">
+        <div class="flex gap-2">
           <div></div>
           <div>redacted</div>
         </div>
-        <div class="flex gap-4">
+        <div class="flex gap-2">
           <div></div>
           <div>redacted</div>
         </div>
-        <div class="flex gap-4">
+        <div class="flex gap-2">
           <div></div>
           <div>redacted</div>
         </div>
-        <div class="flex gap-4">
+        <div class="flex gap-2">
           <div></div>
           <div>redacted</div>
         </div>
