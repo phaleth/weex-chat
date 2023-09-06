@@ -52,6 +52,21 @@ defmodule WeexChatWeb.MessageLive.Index do
   end
 
   @impl true
+  def handle_info(
+        %Phoenix.Socket.Broadcast{topic: target_channel_name, event: "new", payload: message},
+        socket
+      ) do
+    active_channel = Enum.find(socket.assigns.channels, & &1.active)
+
+    socket =
+      if target_channel_name === active_channel.name,
+        do: stream_insert(socket, :messages, message),
+        else: socket
+
+    {:noreply, socket}
+  end
+
+  @impl true
   def handle_event("setup-lists", _params, socket) do
     messages = Color.list_messages()
     last_msg = List.last(messages)
@@ -59,6 +74,9 @@ defmodule WeexChatWeb.MessageLive.Index do
 
     channels = setup_channels(socket.assigns)
     channel_name = get_active_channel_name(channels)
+
+    if channel_name != "n/a",
+      do: WeexChatWeb.Endpoint.subscribe(channel_name)
 
     {:noreply,
      socket
@@ -84,20 +102,20 @@ defmodule WeexChatWeb.MessageLive.Index do
   end
 
   @impl true
-  def handle_event("new-msg", %{"msg" => msg}, socket) do
+  def handle_event("new-msg", %{"msg" => content}, socket) do
     user_id = socket.assigns.user_id
     user_name = socket.assigns.user_name
 
     socket =
       cond do
-        String.starts_with?(msg, "/create ") ->
-          exec_create_command(socket, msg, user_id)
+        String.starts_with?(content, "/create ") ->
+          exec_create_command(socket, content, user_id)
 
-        String.starts_with?(msg, "/join ") ->
-          exec_join_command(socket, msg, user_id)
+        String.starts_with?(content, "/join ") ->
+          exec_join_command(socket, content, user_id)
 
-        String.starts_with?(msg, "/leave ") ->
-          exec_leave_command(socket, msg, user_id)
+        String.starts_with?(content, "/leave ") ->
+          exec_leave_command(socket, content, user_id)
 
         true ->
           new_msg_id = socket.assigns.newest_message_id + 1
@@ -107,10 +125,15 @@ defmodule WeexChatWeb.MessageLive.Index do
               id: new_msg_id,
               user_id: user_id,
               from: user_name,
-              content: msg,
+              content: content,
               inserted_at: DateTime.utc_now()
             }
             |> Map.put(:from_color, WeexChat.Generators.Color.get(user_name))
+
+          active_channel = Enum.find(socket.assigns.channels, & &1.active)
+
+          if active_channel,
+            do: WeexChatWeb.Endpoint.broadcast_from(self(), active_channel.name, "new", message)
 
           socket
           |> assign(:newest_message_id, new_msg_id)
@@ -141,10 +164,19 @@ defmodule WeexChatWeb.MessageLive.Index do
   def handle_event("activate-chan", %{"id" => id}, socket) do
     channels = socket.assigns.channels
 
+    previously_active_channel = Enum.find(channels, & &1.active)
+
     channels =
-      if Enum.find(channels, & &1.active).id === id,
-        do: channels,
-        else: change_channel(channels, id)
+      if previously_active_channel.id === id do
+        channels
+      else
+        WeexChatWeb.Endpoint.unsubscribe(previously_active_channel.name)
+
+        newly_active_channel = Enum.find(channels, &(&1.id === id))
+        WeexChatWeb.Endpoint.subscribe(newly_active_channel.name)
+
+        change_channel(channels, id)
+      end
 
     channel_name = get_active_channel_name(channels)
 
