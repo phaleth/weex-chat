@@ -30,7 +30,7 @@ defmodule WeexChatWeb.Components.Chat do
           </div>
           <div class="flex gap-0.5">
             <div class="w-6 text-right text-green-400 dark:text-lime-700"></div>
-            <div class=" text-gray-700 dark:text-gray-400">weexchat</div>
+            <div class="text-gray-700 dark:text-gray-400">weexchat</div>
           </div>
         </div>
         <div class="grid grid-cols-1" id="channels-container">
@@ -50,9 +50,7 @@ defmodule WeexChatWeb.Components.Chat do
       <div class="flex-auto w-full px-1">
         <div class="flex flex-col h-full">
           <div class="flex-none h-5 text-ellipsis overflow-hidden">
-            <div>
-              Little Fighter Empire | https://discord.gg/MWrHgT4h | https://lf-empire.de/forum/
-            </div>
+            <div class="wxch-chan-topic text-gray-700 dark:text-gray-400"></div>
           </div>
           <div class="flex-auto h-full overflow-x-auto">
             <div
