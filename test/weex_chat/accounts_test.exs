@@ -17,21 +17,21 @@ defmodule WeexChat.AccountsTest do
     end
   end
 
-  describe "get_user_by_email_and_password/2" do
-    test "does not return the user if the email does not exist" do
-      refute Accounts.get_user_by_email_and_password("unknown@example.com", "hello world!")
+  describe "get_user_by_username_and_password/2" do
+    test "does not return the user if the username does not exist" do
+      refute Accounts.get_user_by_username_and_password("unknown_username", "hello world!")
     end
 
     test "does not return the user if the password is not valid" do
       user = user_fixture()
-      refute Accounts.get_user_by_email_and_password(user.email, "invalid")
+      refute Accounts.get_user_by_username_and_password(user.username, "invalid")
     end
 
-    test "returns the user if the email and password are valid" do
+    test "returns the user if the username and password are valid" do
       %{id: id} = user = user_fixture()
 
       assert %User{id: ^id} =
-               Accounts.get_user_by_email_and_password(user.email, valid_user_password())
+               Accounts.get_user_by_username_and_password(user.username, valid_user_password())
     end
   end
 
@@ -295,7 +295,7 @@ defmodule WeexChat.AccountsTest do
         })
 
       assert is_nil(user.password)
-      assert Accounts.get_user_by_email_and_password(user.email, "new valid password")
+      assert Accounts.get_user_by_username_and_password(user.username, "new valid password")
     end
 
     test "deletes all tokens for the given user", %{user: user} do
@@ -490,7 +490,7 @@ defmodule WeexChat.AccountsTest do
     test "updates the password", %{user: user} do
       {:ok, updated_user} = Accounts.reset_user_password(user, %{password: "new valid password"})
       assert is_nil(updated_user.password)
-      assert Accounts.get_user_by_email_and_password(user.email, "new valid password")
+      assert Accounts.get_user_by_username_and_password(user.username, "new valid password")
     end
 
     test "deletes all tokens for the given user", %{user: user} do
