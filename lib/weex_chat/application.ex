@@ -17,9 +17,11 @@ defmodule WeexChat.Application do
       # Start Finch
       {Finch, name: WeexChat.Finch},
       # Start the Endpoint (http/https)
-      WeexChatWeb.Endpoint
+      WeexChatWeb.Endpoint,
       # Start a worker by calling: WeexChat.Worker.start_link(arg)
-      # {WeexChat.Worker, arg}
+      # {WeexChat.Worker, arg},
+      # Start Phoenix Presence
+      WeexChatWeb.Presence
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
