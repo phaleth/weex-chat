@@ -7,8 +7,11 @@ defmodule WeexChatWeb.MessageLive.Index do
   alias WeexChat.Chat.Services.Color
   alias WeexChat.Accounts
   alias WeexChat.Rooms
+  alias WeexChatWeb.Presence
 
   @one_second 1_000
+  @default_name "n/a"
+  @user_list "userlist"
 
   @impl true
   def mount(_params, _session, socket) do
@@ -25,7 +28,7 @@ defmodule WeexChatWeb.MessageLive.Index do
        offset: 0,
        user_id: user_id,
        user_name: user_name,
-       active_channel_name: "n/a",
+       active_channel_name: @default_name,
        channels: [],
        user_names: []
      )
@@ -67,7 +70,22 @@ defmodule WeexChatWeb.MessageLive.Index do
   end
 
   @impl true
+  def handle_info(%{event: "presence_diff", payload: _payload}, socket) do
+    {:noreply,
+     socket
+     |> assign(user_names: current_channel_user_names(socket.assigns.active_channel_name))}
+  end
+
+  @impl true
   def handle_event("setup-lists", _params, socket) do
+    {_, user_name} = get_user_id_and_name(socket.assigns)
+
+    Presence.track(self(), @user_list, socket.id, %{
+      user_name: user_name
+    })
+
+    WeexChatWeb.Endpoint.subscribe(@user_list)
+
     messages = Color.list_messages()
     last_msg = List.last(messages)
     newest_message_id = if is_nil(last_msg), do: 0, else: last_msg.id
@@ -75,7 +93,7 @@ defmodule WeexChatWeb.MessageLive.Index do
     channels = setup_channels(socket.assigns)
     channel_name = get_active_channel_name(channels)
 
-    if channel_name != "n/a",
+    if channel_name != @default_name,
       do: WeexChatWeb.Endpoint.subscribe(channel_name)
 
     {:noreply,
@@ -84,7 +102,7 @@ defmodule WeexChatWeb.MessageLive.Index do
        newest_message_id: newest_message_id,
        active_channel_name: channel_name,
        channels: channels,
-       user_names: WeexChat.Rooms.list_user_names(channel_name)
+       user_names: current_channel_user_names(channel_name)
      )
      |> stream(:messages, messages)}
   end
@@ -186,7 +204,7 @@ defmodule WeexChatWeb.MessageLive.Index do
      |> assign(
        active_channel_name: channel_name,
        channels: channels,
-       user_names: WeexChat.Rooms.list_user_names(channel_name)
+       user_names: current_channel_user_names(channel_name)
      )
      |> stream(:messages, [], reset: true)}
   end
@@ -201,7 +219,7 @@ defmodule WeexChatWeb.MessageLive.Index do
 
   defp get_active_channel_name(channels) do
     if Enum.empty?(channels),
-      do: "n/a",
+      do: @default_name,
       else: Enum.find(channels, & &1.active).name
   end
 
@@ -262,7 +280,7 @@ defmodule WeexChatWeb.MessageLive.Index do
         |> assign(
           active_channel_name: channel_name,
           channels: channels,
-          user_names: WeexChat.Rooms.list_user_names(channel_name)
+          user_names: current_channel_user_names(channel_name)
         )
         |> push_event("hooray", %{})
 
@@ -280,7 +298,7 @@ defmodule WeexChatWeb.MessageLive.Index do
     |> assign(
       active_channel_name: channel_name,
       channels: channels,
-      user_names: WeexChat.Rooms.list_user_names(channel_name)
+      user_names: current_channel_user_names(channel_name)
     )
   end
 
@@ -299,7 +317,7 @@ defmodule WeexChatWeb.MessageLive.Index do
     |> assign(
       active_channel_name: channel_name,
       channels: channels,
-      user_names: WeexChat.Rooms.list_user_names(channel_name)
+      user_names: current_channel_user_names(channel_name)
     )
   end
 
@@ -339,6 +357,22 @@ defmodule WeexChatWeb.MessageLive.Index do
       _ ->
         socket |> put_flash(:error, "Incorrect leave command call.")
     end
+  end
+
+  defp user_names_from_presence() do
+    Presence.list(@user_list)
+    |> Enum.map(fn {_, data} ->
+      entry = data[:metas] |> List.first()
+      entry.user_name
+    end)
+  end
+
+  defp current_channel_user_names(channel_name) do
+    MapSet.intersection(
+      Enum.into(user_names_from_presence(), MapSet.new()),
+      Enum.into(WeexChat.Rooms.list_user_names(channel_name), MapSet.new())
+    )
+    |> MapSet.to_list()
   end
 
   @impl true
