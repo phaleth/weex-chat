@@ -10,6 +10,7 @@ defmodule WeexChatWeb.Components.Chat do
   attr :user_name, :string
   attr :active_channel_name, :string
   attr :user_names, :list
+  attr :channel_index, :integer
 
   def chat(assigns) do
     ~H"""
@@ -105,8 +106,8 @@ defmodule WeexChatWeb.Components.Chat do
                 phx-hook="currentTime"
                 id="current-time"
               ><%= DateTime.utc_now() |> DateTime.add(@offset, :hour)
-              |> Calendar.strftime("%H:%M") %></span><span class="text-purple-700 dark:text-cyan-700">]</span> <span class="text-purple-700 dark:text-cyan-700">[</span>13<span class="text-purple-700 dark:text-cyan-700">]</span> <span class="text-purple-700 dark:text-cyan-700">[</span>irc<span class="text-purple-700 dark:text-cyan-700">/</span>libera<span class="text-purple-700 dark:text-cyan-700">]</span>
-              <span class="text-green-600 dark:text-yellow-200">13</span><span class="text-purple-700 dark:text-cyan-700">:</span><span class="text-green-600 dark:text-lime-400">#<%= @active_channel_name %></span><span class="text-purple-700 dark:text-cyan-700">(</span>+nt<span class="text-purple-700 dark:text-cyan-700">){</span>6<span class="text-purple-700 dark:text-cyan-700">} [</span>Lag:
+              |> Calendar.strftime("%H:%M") %></span><span class="text-purple-700 dark:text-cyan-700">]</span> <span class="text-purple-700 dark:text-cyan-700">[</span>-<span class="text-purple-700 dark:text-cyan-700">]</span> <span class="text-purple-700 dark:text-cyan-700">[</span>-<span class="text-purple-700 dark:text-cyan-700">/</span>-<span class="text-purple-700 dark:text-cyan-700">]</span>
+              <span class="text-green-600 dark:text-yellow-200"><%= @channel_index + 2 %></span><span class="text-purple-700 dark:text-cyan-700">:</span><span class="text-green-600 dark:text-lime-400">#<%= @active_channel_name %></span><span class="text-purple-700 dark:text-cyan-700">(</span>+nt<span class="text-purple-700 dark:text-cyan-700">){</span>6<span class="text-purple-700 dark:text-cyan-700">} [</span>Lag:
               <span class="text-green-600 dark:text-yellow-200" id="ping" phx-hook="ping">-----</span><span class="text-purple-700 dark:text-cyan-700">]</span>
             </div>
             <div class="flex">

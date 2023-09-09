@@ -30,7 +30,8 @@ defmodule WeexChatWeb.MessageLive.Index do
        user_name: user_name,
        active_channel_name: @default_name,
        channels: [],
-       user_names: []
+       user_names: [],
+       channel_index: 0
      )
      |> stream(:messages, []), layout: false}
   end
@@ -91,7 +92,8 @@ defmodule WeexChatWeb.MessageLive.Index do
     newest_message_id = if is_nil(last_msg), do: 0, else: last_msg.id
 
     channels = setup_channels(socket.assigns)
-    channel_name = get_active_channel_name(channels)
+    channel = get_active_channel(channels)
+    channel_name = get_active_channel_name(channel)
 
     if channel_name != @default_name,
       do: WeexChatWeb.Endpoint.subscribe(channel_name)
@@ -102,7 +104,8 @@ defmodule WeexChatWeb.MessageLive.Index do
        newest_message_id: newest_message_id,
        active_channel_name: channel_name,
        channels: channels,
-       user_names: current_channel_user_names(channel_name)
+       user_names: current_channel_user_names(channel_name),
+       channel_index: get_active_channel_index(channel)
      )
      |> stream(:messages, messages)}
   end
@@ -196,7 +199,8 @@ defmodule WeexChatWeb.MessageLive.Index do
         change_channel(channels, id)
       end
 
-    channel_name = get_active_channel_name(channels)
+    channel = get_active_channel(channels)
+    channel_name = get_active_channel_name(channel)
 
     {:noreply,
      socket
@@ -204,7 +208,8 @@ defmodule WeexChatWeb.MessageLive.Index do
      |> assign(
        active_channel_name: channel_name,
        channels: channels,
-       user_names: current_channel_user_names(channel_name)
+       user_names: current_channel_user_names(channel_name),
+       channel_index: get_active_channel_index(channel)
      )
      |> stream(:messages, [], reset: true)}
   end
@@ -217,10 +222,20 @@ defmodule WeexChatWeb.MessageLive.Index do
       else: {nil, "Anonymous"}
   end
 
-  defp get_active_channel_name(channels) do
-    if Enum.empty?(channels),
+  defp get_active_channel(channels) do
+    Enum.find(channels, & &1.active)
+  end
+
+  defp get_active_channel_index(active_channel) do
+    if is_nil(active_channel),
+      do: 0,
+      else: active_channel.index
+  end
+
+  defp get_active_channel_name(active_channel) do
+    if is_nil(active_channel),
       do: @default_name,
-      else: Enum.find(channels, & &1.active).name
+      else: active_channel.name
   end
 
   defp setup_channels(assigns) do
@@ -274,13 +289,15 @@ defmodule WeexChatWeb.MessageLive.Index do
          }) do
       {:ok, channel} ->
         channels = activate_channel(socket.assigns.channels, channel, user_id)
-        channel_name = get_active_channel_name(channels)
+        channel = get_active_channel(channels)
+        channel_name = get_active_channel_name(channel)
 
         socket
         |> assign(
           active_channel_name: channel_name,
           channels: channels,
-          user_names: current_channel_user_names(channel_name)
+          user_names: current_channel_user_names(channel_name),
+          channel_index: get_active_channel_index(channel)
         )
         |> push_event("hooray", %{})
 
@@ -298,7 +315,8 @@ defmodule WeexChatWeb.MessageLive.Index do
     |> assign(
       active_channel_name: channel_name,
       channels: channels,
-      user_names: current_channel_user_names(channel_name)
+      user_names: current_channel_user_names(channel_name),
+      channel_index: get_active_channel_index(channel)
     )
   end
 
@@ -311,13 +329,15 @@ defmodule WeexChatWeb.MessageLive.Index do
     )
 
     channels = setup_channels(socket.assigns)
-    channel_name = get_active_channel_name(channels)
+    channel = get_active_channel(channels)
+    channel_name = get_active_channel_name(channel)
 
     socket
     |> assign(
       active_channel_name: channel_name,
       channels: channels,
-      user_names: current_channel_user_names(channel_name)
+      user_names: current_channel_user_names(channel_name),
+      channel_index: get_active_channel_index(channel)
     )
   end
 
@@ -386,6 +406,7 @@ defmodule WeexChatWeb.MessageLive.Index do
       user_name={assigns.user_name}
       active_channel_name={assigns.active_channel_name}
       user_names={assigns.user_names}
+      channel_index={assigns.channel_index}
     />
     """
   end
