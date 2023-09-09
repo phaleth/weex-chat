@@ -31,7 +31,8 @@ defmodule WeexChatWeb.MessageLive.Index do
        active_channel_name: @default_name,
        channels: [],
        user_names: [],
-       channel_index: 0
+       channel_index: 0,
+       user_count: 0
      )
      |> stream(:messages, []), layout: false}
   end
@@ -72,9 +73,11 @@ defmodule WeexChatWeb.MessageLive.Index do
 
   @impl true
   def handle_info(%{event: "presence_diff", payload: _payload}, socket) do
+    user_names = current_channel_user_names(socket.assigns.active_channel_name)
+
     {:noreply,
      socket
-     |> assign(user_names: current_channel_user_names(socket.assigns.active_channel_name))}
+     |> assign(user_names: user_names, user_count: length(user_names))}
   end
 
   @impl true
@@ -98,14 +101,17 @@ defmodule WeexChatWeb.MessageLive.Index do
     if channel_name != @default_name,
       do: WeexChatWeb.Endpoint.subscribe(channel_name)
 
+    user_names = current_channel_user_names(channel_name)
+
     {:noreply,
      socket
      |> assign(
        newest_message_id: newest_message_id,
        active_channel_name: channel_name,
        channels: channels,
-       user_names: current_channel_user_names(channel_name),
-       channel_index: get_active_channel_index(channel)
+       user_names: user_names,
+       channel_index: get_active_channel_index(channel),
+       user_count: length(user_names)
      )
      |> stream(:messages, messages)}
   end
@@ -202,14 +208,17 @@ defmodule WeexChatWeb.MessageLive.Index do
     channel = get_active_channel(channels)
     channel_name = get_active_channel_name(channel)
 
+    user_names = current_channel_user_names(channel_name)
+
     {:noreply,
      socket
      |> push_event("clear-chat", %{})
      |> assign(
        active_channel_name: channel_name,
        channels: channels,
-       user_names: current_channel_user_names(channel_name),
-       channel_index: get_active_channel_index(channel)
+       user_names: user_names,
+       channel_index: get_active_channel_index(channel),
+       user_count: length(user_names)
      )
      |> stream(:messages, [], reset: true)}
   end
@@ -292,12 +301,15 @@ defmodule WeexChatWeb.MessageLive.Index do
         channel = get_active_channel(channels)
         channel_name = get_active_channel_name(channel)
 
+        user_names = current_channel_user_names(channel_name)
+
         socket
         |> assign(
           active_channel_name: channel_name,
           channels: channels,
-          user_names: current_channel_user_names(channel_name),
-          channel_index: get_active_channel_index(channel)
+          user_names: user_names,
+          channel_index: get_active_channel_index(channel),
+          user_count: length(user_names)
         )
         |> push_event("hooray", %{})
 
@@ -311,12 +323,15 @@ defmodule WeexChatWeb.MessageLive.Index do
     channel = Rooms.get_channel!(channel_name)
     channels = activate_channel(socket.assigns.channels, channel, user_id)
 
+    user_names = current_channel_user_names(channel_name)
+
     socket
     |> assign(
       active_channel_name: channel_name,
       channels: channels,
-      user_names: current_channel_user_names(channel_name),
-      channel_index: get_active_channel_index(channel)
+      user_names: user_names,
+      channel_index: get_active_channel_index(channel),
+      user_count: length(user_names)
     )
   end
 
@@ -332,12 +347,15 @@ defmodule WeexChatWeb.MessageLive.Index do
     channel = get_active_channel(channels)
     channel_name = get_active_channel_name(channel)
 
+    user_names = current_channel_user_names(channel_name)
+
     socket
     |> assign(
       active_channel_name: channel_name,
       channels: channels,
-      user_names: current_channel_user_names(channel_name),
-      channel_index: get_active_channel_index(channel)
+      user_names: user_names,
+      channel_index: get_active_channel_index(channel),
+      user_count: length(user_names)
     )
   end
 
@@ -407,6 +425,7 @@ defmodule WeexChatWeb.MessageLive.Index do
       active_channel_name={assigns.active_channel_name}
       user_names={assigns.user_names}
       channel_index={assigns.channel_index}
+      user_count={assigns.user_count}
     />
     """
   end
