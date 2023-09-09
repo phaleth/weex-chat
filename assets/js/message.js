@@ -56,14 +56,18 @@ class Message {
     modEl.classList.remove("group-hover:inline");
     delEl.classList.remove("group-hover:inline");
 
-    inputEl.addEventListener("focusout", () => {
+    const focusOutHandler = function () {
       formEl.insertAdjacentHTML("beforeBegin", priorTextHTML);
       textEl = formEl.previousElementSibling;
       textEl.textContent = inputEl.value;
       formEl.remove();
       modEl.classList.add("group-hover:inline");
       delEl.classList.add("group-hover:inline");
-    });
+
+      this.removeEventListener("focusout", focusOutHandler);
+    };
+
+    inputEl.addEventListener("focusout", focusOutHandler);
   }
 
   delete(e) {
