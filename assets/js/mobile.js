@@ -38,3 +38,7 @@ export const refreshSidebars = () => {
     }, 250);
   };
 };
+
+export const userMenuClickHandler = (e) => {
+  e.target.nextElementSibling.classList.remove("hidden");
+};

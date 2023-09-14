@@ -1,5 +1,6 @@
 import message from "./message";
 import confetti from "./confetti";
+import { userMenuClickHandler } from "./mobile";
 
 export default {
   ping: {
@@ -43,6 +44,14 @@ export default {
           container.removeChild(container.lastChild);
         }
       });
+      document
+        .querySelector(".wxch-user-menu")
+        .addEventListener("click", userMenuClickHandler);
+    },
+    destroyed() {
+      document
+        .querySelector(".wxch-user-menu")
+        .removeEventListener("click", userMenuClickHandler);
     },
   },
   msgSubmit: {
