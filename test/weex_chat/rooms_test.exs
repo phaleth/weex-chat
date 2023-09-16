@@ -21,10 +21,10 @@ defmodule WeexChat.RoomsTest do
     end
 
     test "create_channel/1 with valid data creates a channel" do
-      valid_attrs = %{name: "some name", user_is_guest: true}
+      valid_attrs = %{name: "some-name", user_is_guest: true}
 
       assert {:ok, %Channel{} = channel} = Rooms.create_channel(valid_attrs)
-      assert channel.name == "some name"
+      assert channel.name == "some-name"
       assert channel.user_is_guest == true
     end
 
@@ -34,10 +34,10 @@ defmodule WeexChat.RoomsTest do
 
     test "update_channel/2 with valid data updates the channel" do
       channel = channel_fixture()
-      update_attrs = %{name: "some updated name", user_is_guest: false}
+      update_attrs = %{name: "some-updated-name", user_is_guest: false}
 
       assert {:ok, %Channel{} = channel} = Rooms.update_channel(channel, update_attrs)
-      assert channel.name == "some updated name"
+      assert channel.name == "some-updated-name"
       assert channel.user_is_guest == false
     end
 

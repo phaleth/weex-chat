@@ -11,7 +11,7 @@ defmodule WeexChat.RoomsFixtures do
     {:ok, channel} =
       attrs
       |> Enum.into(%{
-        name: "some name",
+        name: "channel-name",
         user_is_guest: true
       })
       |> WeexChat.Rooms.create_channel()
