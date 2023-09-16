@@ -324,8 +324,10 @@ defmodule WeexChatWeb.MessageLive.Index do
   end
 
   defp join_channel_by_name(socket, channel_name, user_id) do
-    channel = Rooms.get_channel!(channel_name)
-    channels = activate_channel(socket.assigns.channels, channel, user_id)
+    channels =
+      activate_channel(socket.assigns.channels, Rooms.get_channel!(channel_name), user_id)
+
+    channel = get_active_channel(channels)
 
     user_names = current_channel_user_names(channel_name)
 
