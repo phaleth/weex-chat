@@ -58,15 +58,13 @@ defmodule WeexChatWeb.MessageLive.Index do
 
   @impl true
   def handle_info(
-        %Phoenix.Socket.Broadcast{topic: target_channel_name, event: "new", payload: message},
+        %Phoenix.Socket.Broadcast{topic: _target_channel_name, event: "new", payload: message},
         socket
       ) do
-    active_channel = Enum.find(socket.assigns.channels, & &1.active)
-
     socket =
-      if target_channel_name === active_channel.name and !is_nil(message),
-        do: stream_insert(socket, :messages, message),
-        else: socket
+      if is_nil(message),
+        do: socket,
+        else: stream_insert(socket, :messages, message)
 
     {:noreply, socket}
   end
@@ -147,6 +145,8 @@ defmodule WeexChatWeb.MessageLive.Index do
         true ->
           new_msg_id = socket.assigns.newest_message_id + 1
 
+          active_channel = Enum.find(socket.assigns.channels, & &1.active)
+
           message =
             if String.length(content) > 0,
               do:
@@ -155,27 +155,27 @@ defmodule WeexChatWeb.MessageLive.Index do
                   user_id: user_id,
                   from: user_name,
                   content: content,
+                  channel_name: active_channel.name,
                   inserted_at: DateTime.utc_now()
                 }
                 |> Map.put(:from_color, WeexChat.Generators.Color.get(user_name)),
               else: nil
 
-          active_channel = Enum.find(socket.assigns.channels, & &1.active)
-
-          if active_channel,
-            do: WeexChatWeb.Endpoint.broadcast_from(self(), active_channel.name, "new", message)
+          WeexChatWeb.Endpoint.broadcast_from(self(), active_channel.name, "new", message)
 
           socket
           |> assign(:newest_message_id, new_msg_id)
 
-          if is_nil(message), do: socket, else: stream_insert(socket, :messages, message)
+          if is_nil(message),
+            do: socket,
+            else: stream_insert(socket, :messages, message)
       end
 
     {:noreply, socket}
   end
 
   @impl true
-  def handle_event("mod-msg", %{"id" => "mod-messages-" <> id, "value" => msg}, socket) do
+  def handle_event("mod-msg", %{"id" => id, "value" => msg}, socket) do
     IO.puts(id)
     IO.puts(msg)
     {:noreply, socket}
@@ -216,7 +216,7 @@ defmodule WeexChatWeb.MessageLive.Index do
 
     {:noreply,
      socket
-     |> push_event("clear-chat", %{})
+     |> push_event("change-chan", %{channel: channel_name})
      |> assign(
        active_channel_name: channel_name,
        channels: channels,

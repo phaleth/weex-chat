@@ -20,6 +20,7 @@ defmodule WeexChat.Rooms.Channel do
     channel
     |> cast(attrs, [:name, :user_is_guest])
     |> validate_required([:name, :user_is_guest])
+    |> validate_format(:name, ~r/^[^\s]+$/, message: "must have no spaces")
     |> unsafe_validate_unique(:name, WeexChat.Repo)
     |> put_assoc(:users, users)
   end

@@ -7,6 +7,7 @@ defmodule WeexChat.Chat.Message do
     field :content, :string
     field :from, :string
     field :user_id, :id
+    field :channel_name, :string, virtual: true
 
     timestamps()
   end

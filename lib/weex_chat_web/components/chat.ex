@@ -61,40 +61,46 @@ defmodule WeexChatWeb.Components.Chat do
               id="messages-container"
             >
               <%= for {id, message} <- @streams.messages do %>
-                <div class="pr-1">
-                  <%= if !@loading do %>
-                    <span>
-                      <%= DateTime.from_naive!(message.inserted_at, "Etc/UTC")
-                      |> DateTime.add(@offset, :hour)
-                      |> Calendar.strftime("%H:%M") %>
-                    </span>
+                <%= for channel <- @channels do %>
+                  <%= if message.channel_name === channel.name do %>
+                    <div class={"wxch-msg wxch-msg-#{channel.name} pr-1"}>
+                      <%= if !@loading do %>
+                        <span>
+                          <%= DateTime.from_naive!(message.inserted_at, "Etc/UTC")
+                          |> DateTime.add(@offset, :hour)
+                          |> Calendar.strftime("%H:%M") %>
+                        </span>
+                      <% end %>
+                    </div>
+                    <div
+                      class={"wxch-msg wxch-msg-#{channel.name} px-1 text-right" <> if(message.from == "ℹ", do: " pr-3", else: "")}
+                      style={"color: #{message.from_color};"}
+                    >
+                      <%= message.from %>
+                    </div>
+                    <div class={"wxch-msg wxch-msg-#{channel.name} px-1 text-green-600 dark:text-lime-400"}>
+                      ╡
+                    </div>
+                    <div class={"wxch-msg wxch-msg-#{channel.name} flex group"}>
+                      <span class="flex-none"><%= message.content %></span>
+                      <span
+                        id={"mod-#{channel.name}-#{id}"}
+                        phx-hook="modMsg"
+                        class="flex-none ml-2 hidden group-hover:inline cursor-pointer text-lime-200"
+                      >
+                        &#128393;
+                      </span>
+                      <span
+                        id={"del-#{channel.name}-#{id}"}
+                        phx-click={JS.push("del-msg", value: %{id: id})}
+                        phx-hook="delMsg"
+                        class="flex-none ml-2 hidden group-hover:inline cursor-pointer"
+                      >
+                        &#10060;
+                      </span>
+                    </div>
                   <% end %>
-                </div>
-                <div
-                  class={"px-1 text-right" <> if(message.from == "ℹ", do: " pr-3", else: "")}
-                  style={"color: #{message.from_color};"}
-                >
-                  <%= message.from %>
-                </div>
-                <div class="px-1 text-green-600 dark:text-lime-400">╡</div>
-                <div class="flex group">
-                  <span class="flex-none"><%= message.content %></span>
-                  <span
-                    id={"mod-#{id}"}
-                    phx-hook="modMsg"
-                    class="flex-none ml-2 hidden group-hover:inline cursor-pointer text-lime-200"
-                  >
-                    &#128393;
-                  </span>
-                  <span
-                    id={"del-#{id}"}
-                    phx-click={JS.push("del-msg", value: %{id: id})}
-                    phx-hook="delMsg"
-                    class="flex-none ml-2 hidden group-hover:inline cursor-pointer"
-                  >
-                    &#10060;
-                  </span>
-                </div>
+                <% end %>
               <% end %>
             </div>
           </div>
@@ -118,7 +124,11 @@ defmodule WeexChatWeb.Components.Chat do
                   type="text"
                   id="msg"
                   name="msg"
-                  placeholder="Type here..."
+                  placeholder={
+                    if @active_channel_name === "n/a",
+                      do: "Join a channel first...",
+                      else: "Type here..."
+                  }
                   phx-hook="msgSubmit"
                 />
               </form>

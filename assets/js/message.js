@@ -80,6 +80,16 @@ class Message {
     from.remove();
     time.remove();
   }
+
+  toggleMessagesVisibility(channelName) {
+    document.querySelectorAll(".wxch-msg").forEach((el) => {
+      if (el.classList.contains(`wxch-msg-${channelName}`)) {
+        el.classList.remove("hidden");
+      } else {
+        el.classList.add("hidden");
+      }
+    });
+  }
 }
 
 export default new Message();

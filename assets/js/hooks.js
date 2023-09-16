@@ -35,15 +35,10 @@ export default {
   setupLists: {
     mounted() {
       this.pushEvent("setup-lists", {});
-      this.handleEvent("hooray", () => {
-        confetti.explosion();
-      });
-      this.handleEvent("clear-chat", () => {
-        const container = document.getElementById("messages-container");
-        while (container.firstChild) {
-          container.removeChild(container.lastChild);
-        }
-      });
+      this.handleEvent("hooray", () => confetti.explosion());
+      this.handleEvent("change-chan", ({ channel }) =>
+        message.toggleMessagesVisibility(channel)
+      );
       document
         .querySelector(".wxch-user-menu")
         .addEventListener("click", userMenuClickHandler);
