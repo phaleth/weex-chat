@@ -12,6 +12,7 @@ defmodule WeexChatWeb.MessageLive.Index do
   @one_second 1_000
   @default_name "n/a"
   @user_list "userlist"
+  @messages "messages"
 
   @impl true
   def mount(_params, _session, socket) do
@@ -58,7 +59,7 @@ defmodule WeexChatWeb.MessageLive.Index do
 
   @impl true
   def handle_info(
-        %Phoenix.Socket.Broadcast{topic: _target_channel_name, event: "new", payload: message},
+        %Phoenix.Socket.Broadcast{topic: @messages, event: "new", payload: message},
         socket
       ) do
     socket =
@@ -96,8 +97,7 @@ defmodule WeexChatWeb.MessageLive.Index do
     channel = get_active_channel(channels)
     channel_name = get_active_channel_name(channel)
 
-    if channel_name != @default_name,
-      do: WeexChatWeb.Endpoint.subscribe(channel_name)
+    WeexChatWeb.Endpoint.subscribe(@messages)
 
     user_names = current_channel_user_names(channel_name)
 
@@ -145,7 +145,7 @@ defmodule WeexChatWeb.MessageLive.Index do
         true ->
           new_msg_id = socket.assigns.newest_message_id + 1
 
-          active_channel = Enum.find(socket.assigns.channels, & &1.active)
+          active_channel_name = Enum.find(socket.assigns.channels, & &1.active).name
 
           message =
             if String.length(content) > 0,
@@ -154,13 +154,13 @@ defmodule WeexChatWeb.MessageLive.Index do
                 user_id: user_id,
                 from: user_name,
                 content: content,
-                channel_name: active_channel.name,
+                channel_name: active_channel_name,
                 from_color: WeexChat.Generators.Color.get(user_name),
                 inserted_at: DateTime.utc_now()
               },
               else: nil
 
-          WeexChatWeb.Endpoint.broadcast_from(self(), active_channel.name, "new", message)
+          WeexChatWeb.Endpoint.broadcast_from(self(), @messages, "new", message)
 
           socket
           |> assign(:newest_message_id, new_msg_id)
@@ -200,11 +200,6 @@ defmodule WeexChatWeb.MessageLive.Index do
       if previously_active_channel.id === id do
         channels
       else
-        WeexChatWeb.Endpoint.unsubscribe(previously_active_channel.name)
-
-        newly_active_channel = Enum.find(channels, &(&1.id === id))
-        WeexChatWeb.Endpoint.subscribe(newly_active_channel.name)
-
         change_channel(channels, id)
       end
 

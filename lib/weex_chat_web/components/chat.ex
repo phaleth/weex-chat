@@ -63,7 +63,7 @@ defmodule WeexChatWeb.Components.Chat do
               <%= for {id, message} <- @streams.messages do %>
                 <%= for channel <- @channels do %>
                   <%= if message.channel_name === channel.name do %>
-                    <div class={"wxch-msg wxch-msg-#{channel.name} pr-1"}>
+                    <div class={"wxch-msg wxch-msg-#{channel.name} pr-1" <> if(channel.active, do: "", else: " hidden")}>
                       <%= if !@loading do %>
                         <span>
                           <%= DateTime.from_naive!(message.inserted_at, "Etc/UTC")
@@ -73,15 +73,15 @@ defmodule WeexChatWeb.Components.Chat do
                       <% end %>
                     </div>
                     <div
-                      class={"wxch-msg wxch-msg-#{channel.name} px-1 text-right" <> if(message.from == "ℹ", do: " pr-3", else: "")}
+                      class={"wxch-msg wxch-msg-#{channel.name} px-1 text-right" <> if(message.from == "ℹ", do: " pr-3", else: "") <> if(channel.active, do: "", else: " hidden")}
                       style={"color: #{message.from_color};"}
                     >
                       <%= message.from %>
                     </div>
-                    <div class={"wxch-msg wxch-msg-#{channel.name} px-1 text-green-600 dark:text-lime-400"}>
+                    <div class={"wxch-msg wxch-msg-#{channel.name} px-1 text-green-600 dark:text-lime-400" <> if(channel.active, do: "", else: " hidden")}>
                       ╡
                     </div>
-                    <div class={"wxch-msg wxch-msg-#{channel.name} flex group"}>
+                    <div class={"wxch-msg wxch-msg-#{channel.name} flex group" <> if(channel.active, do: "", else: " hidden")}>
                       <span class="flex-none"><%= message.content %></span>
                       <span
                         id={"mod-#{channel.name}-#{id}"}
