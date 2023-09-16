@@ -64,7 +64,7 @@ defmodule WeexChatWeb.MessageLive.Index do
     active_channel = Enum.find(socket.assigns.channels, & &1.active)
 
     socket =
-      if target_channel_name === active_channel.name,
+      if target_channel_name === active_channel.name and !is_nil(message),
         do: stream_insert(socket, :messages, message),
         else: socket
 
@@ -148,14 +148,17 @@ defmodule WeexChatWeb.MessageLive.Index do
           new_msg_id = socket.assigns.newest_message_id + 1
 
           message =
-            %Message{
-              id: new_msg_id,
-              user_id: user_id,
-              from: user_name,
-              content: content,
-              inserted_at: DateTime.utc_now()
-            }
-            |> Map.put(:from_color, WeexChat.Generators.Color.get(user_name))
+            if String.length(content) > 0,
+              do:
+                %Message{
+                  id: new_msg_id,
+                  user_id: user_id,
+                  from: user_name,
+                  content: content,
+                  inserted_at: DateTime.utc_now()
+                }
+                |> Map.put(:from_color, WeexChat.Generators.Color.get(user_name)),
+              else: nil
 
           active_channel = Enum.find(socket.assigns.channels, & &1.active)
 
@@ -164,7 +167,8 @@ defmodule WeexChatWeb.MessageLive.Index do
 
           socket
           |> assign(:newest_message_id, new_msg_id)
-          |> stream_insert(:messages, message)
+
+          if is_nil(message), do: socket, else: stream_insert(socket, :messages, message)
       end
 
     {:noreply, socket}
