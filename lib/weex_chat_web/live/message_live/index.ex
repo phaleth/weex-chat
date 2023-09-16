@@ -149,16 +149,15 @@ defmodule WeexChatWeb.MessageLive.Index do
 
           message =
             if String.length(content) > 0,
-              do:
-                %Message{
-                  id: new_msg_id,
-                  user_id: user_id,
-                  from: user_name,
-                  content: content,
-                  channel_name: active_channel.name,
-                  inserted_at: DateTime.utc_now()
-                }
-                |> Map.put(:from_color, WeexChat.Generators.Color.get(user_name)),
+              do: %Message{
+                id: new_msg_id,
+                user_id: user_id,
+                from: user_name,
+                content: content,
+                channel_name: active_channel.name,
+                from_color: WeexChat.Generators.Color.get(user_name),
+                inserted_at: DateTime.utc_now()
+              },
               else: nil
 
           WeexChatWeb.Endpoint.broadcast_from(self(), active_channel.name, "new", message)
