@@ -144,7 +144,6 @@ defmodule WeexChatWeb.MessageLive.Index do
 
         true ->
           new_msg_id = socket.assigns.newest_message_id + 1
-
           active_channel_name = Enum.find(socket.assigns.channels, & &1.active).name
 
           message =
@@ -162,12 +161,13 @@ defmodule WeexChatWeb.MessageLive.Index do
 
           WeexChatWeb.Endpoint.broadcast_from(self(), @messages, "new", message)
 
+          socket =
+            if is_nil(message),
+              do: socket,
+              else: stream_insert(socket, :messages, message)
+
           socket
           |> assign(:newest_message_id, new_msg_id)
-
-          if is_nil(message),
-            do: socket,
-            else: stream_insert(socket, :messages, message)
       end
 
     {:noreply, socket}
@@ -424,6 +424,7 @@ defmodule WeexChatWeb.MessageLive.Index do
       user_names={assigns.user_names}
       channel_index={assigns.channel_index}
       user_count={assigns.user_count}
+      current_user={assigns.current_user}
     />
     """
   end

@@ -12,6 +12,7 @@ defmodule WeexChatWeb.Components.Chat do
   attr :user_names, :list
   attr :channel_index, :integer
   attr :user_count, :integer
+  attr :current_user, WeexChat.Accounts.User
 
   def chat(assigns) do
     ~H"""
@@ -84,6 +85,7 @@ defmodule WeexChatWeb.Components.Chat do
                     <div class={"wxch-msg wxch-msg-#{channel.name} flex group" <> if(channel.active, do: "", else: " hidden")}>
                       <span class="flex-none"><%= message.content %></span>
                       <span
+                        :if={@current_user && @current_user.id == message.user_id}
                         id={"mod-#{channel.name}-#{id}"}
                         phx-hook="modMsg"
                         class="flex-none ml-2 hidden group-hover:inline cursor-pointer text-lime-200"
@@ -91,6 +93,7 @@ defmodule WeexChatWeb.Components.Chat do
                         &#128393;
                       </span>
                       <span
+                        :if={@current_user && @current_user.id == message.user_id}
                         id={"del-#{channel.name}-#{id}"}
                         phx-click={JS.push("del-msg", value: %{id: id})}
                         phx-hook="delMsg"
