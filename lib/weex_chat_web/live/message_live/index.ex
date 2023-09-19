@@ -131,6 +131,33 @@ defmodule WeexChatWeb.MessageLive.Index do
     user_id = socket.assigns.user_id
     user_name = socket.assigns.user_name
 
+    new_msg_socket = fn new_msg_id, active_channel ->
+      active_channel_name = active_channel.name
+
+      message =
+        if String.length(content) > 0,
+          do: %Message{
+            id: new_msg_id,
+            user_id: user_id,
+            from: user_name,
+            content: content,
+            channel_name: active_channel_name,
+            from_color: WeexChat.Generators.Color.get(user_name),
+            inserted_at: DateTime.utc_now()
+          },
+          else: nil
+
+      WeexChatWeb.Endpoint.broadcast_from(self(), @messages, "new", message)
+
+      socket =
+        if is_nil(message),
+          do: socket,
+          else: stream_insert(socket, :messages, message)
+
+      socket
+      |> assign(:newest_message_id, new_msg_id)
+    end
+
     socket =
       cond do
         String.starts_with?(content, "/create ") ->
@@ -144,30 +171,13 @@ defmodule WeexChatWeb.MessageLive.Index do
 
         true ->
           new_msg_id = socket.assigns.newest_message_id + 1
-          active_channel_name = Enum.find(socket.assigns.channels, & &1.active).name
+          active_channel = Enum.find(socket.assigns.channels, & &1.active)
 
-          message =
-            if String.length(content) > 0,
-              do: %Message{
-                id: new_msg_id,
-                user_id: user_id,
-                from: user_name,
-                content: content,
-                channel_name: active_channel_name,
-                from_color: WeexChat.Generators.Color.get(user_name),
-                inserted_at: DateTime.utc_now()
-              },
-              else: nil
-
-          WeexChatWeb.Endpoint.broadcast_from(self(), @messages, "new", message)
-
-          socket =
-            if is_nil(message),
-              do: socket,
-              else: stream_insert(socket, :messages, message)
-
-          socket
-          |> assign(:newest_message_id, new_msg_id)
+          if is_nil(active_channel) do
+            socket
+          else
+            new_msg_socket.(new_msg_id, active_channel)
+          end
       end
 
     {:noreply, socket}
