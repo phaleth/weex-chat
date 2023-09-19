@@ -4,6 +4,18 @@ class Message {
       return Message._instance;
     }
     Message._instance = this;
+
+    this.messagesContainer =
+      document.getElementById("messages-container").parentElement;
+  }
+
+  scrollToBottom() {
+    setTimeout(() => {
+      this.messagesContainer.scroll({
+        top: this.messagesContainer.scrollHeight,
+        behavior: "smooth",
+      });
+    }, 100);
   }
 
   submitForm(el) {
@@ -11,6 +23,7 @@ class Message {
       new Event("submit", { bubbles: true, cancelable: true })
     );
     el.value = "";
+    this.scrollToBottom();
   }
 
   sendOnEnter(e) {
