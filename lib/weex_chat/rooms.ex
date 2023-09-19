@@ -63,12 +63,12 @@ defmodule WeexChat.Rooms do
   """
   def get_channel!(id) when is_number(id) do
     from(ch in Channel, where: ch.id == ^id, preload: [:users])
-    |> Repo.one!()
+    |> Repo.all()
   end
 
   def get_channel!(name) when is_binary(name) do
     from(ch in Channel, where: ch.name == ^name, preload: [:users])
-    |> Repo.one!()
+    |> Repo.all()
   end
 
   @doc """

@@ -326,21 +326,31 @@ defmodule WeexChatWeb.MessageLive.Index do
   end
 
   defp join_channel_by_name(socket, channel_name, user_id) do
-    channels =
-      activate_channel(socket.assigns.channels, Rooms.get_channel!(channel_name), user_id)
+    channel = List.first(Rooms.get_channel!(channel_name))
 
-    channel = get_active_channel(channels)
+    if is_nil(channel) do
+      socket
+    else
+      channels =
+        activate_channel(
+          socket.assigns.channels,
+          channel,
+          user_id
+        )
 
-    user_names = current_channel_user_names(channel_name)
+      channel = get_active_channel(channels)
 
-    socket
-    |> assign(
-      active_channel_name: channel_name,
-      channels: channels,
-      user_names: user_names,
-      channel_index: get_active_channel_index(channel),
-      user_count: length(user_names)
-    )
+      user_names = current_channel_user_names(channel_name)
+
+      socket
+      |> assign(
+        active_channel_name: channel_name,
+        channels: channels,
+        user_names: user_names,
+        channel_index: get_active_channel_index(channel),
+        user_count: length(user_names)
+      )
+    end
   end
 
   defp leave_channel_by_name(socket, channel_name, user_id) do
