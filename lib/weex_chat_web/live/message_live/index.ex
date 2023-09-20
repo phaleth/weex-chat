@@ -67,7 +67,9 @@ defmodule WeexChatWeb.MessageLive.Index do
         do: socket,
         else: stream_insert(socket, :messages, message)
 
-    {:noreply, socket}
+    {:noreply,
+     socket
+     |> push_event("scroll", %{})}
   end
 
   @impl true

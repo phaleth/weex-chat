@@ -42,6 +42,7 @@ export default {
       document
         .querySelector(".wxch-user-menu")
         .addEventListener("click", userMenuClickHandler);
+      this.handleEvent("scroll", () => message.scrollToBottom());
     },
     destroyed() {
       document
