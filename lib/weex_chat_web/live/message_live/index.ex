@@ -328,7 +328,7 @@ defmodule WeexChatWeb.MessageLive.Index do
   end
 
   defp join_channel_by_name(socket, channel_name, user_id) do
-    channel = List.first(Rooms.get_channel!(channel_name))
+    channel = List.first(Rooms.get_channel(channel_name))
 
     if is_nil(channel) do
       socket
@@ -356,27 +356,31 @@ defmodule WeexChatWeb.MessageLive.Index do
   end
 
   defp leave_channel_by_name(socket, channel_name, user_id) do
-    channel = Rooms.get_channel!(channel_name)
+    channel = List.first(Rooms.get_channel(channel_name))
 
-    Ecto.Adapters.SQL.query(
-      WeexChat.Repo,
-      "DELETE FROM users_channels WHERE user_id = #{user_id} AND channel_id = #{channel.id}"
-    )
+    if is_nil(channel) do
+      socket
+    else
+      Ecto.Adapters.SQL.query(
+        WeexChat.Repo,
+        "DELETE FROM users_channels WHERE user_id = #{user_id} AND channel_id = #{channel.id}"
+      )
 
-    channels = setup_channels(socket.assigns)
-    channel = get_active_channel(channels)
-    channel_name = get_active_channel_name(channel)
+      channels = setup_channels(socket.assigns)
+      channel = get_active_channel(channels)
+      channel_name = get_active_channel_name(channel)
 
-    user_names = current_channel_user_names(channel_name)
+      user_names = current_channel_user_names(channel_name)
 
-    socket
-    |> assign(
-      active_channel_name: channel_name,
-      channels: channels,
-      user_names: user_names,
-      channel_index: get_active_channel_index(channel),
-      user_count: length(user_names)
-    )
+      socket
+      |> assign(
+        active_channel_name: channel_name,
+        channels: channels,
+        user_names: user_names,
+        channel_index: get_active_channel_index(channel),
+        user_count: length(user_names)
+      )
+    end
   end
 
   defp maybe_exec_channel_command(socket, channel, user_id, callback) do

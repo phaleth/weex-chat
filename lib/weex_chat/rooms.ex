@@ -61,12 +61,12 @@ defmodule WeexChat.Rooms do
       ** (Ecto.NoResultsError)
 
   """
-  def get_channel!(id) when is_number(id) do
+  def get_channel(id) when is_number(id) do
     from(ch in Channel, where: ch.id == ^id, preload: [:users])
     |> Repo.all()
   end
 
-  def get_channel!(name) when is_binary(name) do
+  def get_channel(name) when is_binary(name) do
     from(ch in Channel, where: ch.name == ^name, preload: [:users])
     |> Repo.all()
   end

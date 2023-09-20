@@ -17,7 +17,7 @@ defmodule WeexChat.RoomsTest do
 
     test "get_channel!/1 returns the channel with given id" do
       channel = channel_fixture()
-      assert Rooms.get_channel!(channel.id) == [channel]
+      assert Rooms.get_channel(channel.id) == [channel]
     end
 
     test "create_channel/1 with valid data creates a channel" do
@@ -44,13 +44,13 @@ defmodule WeexChat.RoomsTest do
     test "update_channel/2 with invalid data returns error changeset" do
       channel = channel_fixture()
       assert {:error, %Ecto.Changeset{}} = Rooms.update_channel(channel, @invalid_attrs)
-      assert [channel] == Rooms.get_channel!(channel.id)
+      assert [channel] == Rooms.get_channel(channel.id)
     end
 
     test "delete_channel/1 deletes the channel" do
       channel = channel_fixture()
       assert {:ok, %Channel{}} = Rooms.delete_channel(channel)
-      assert Rooms.get_channel!(channel.id) == []
+      assert Rooms.get_channel(channel.id) == []
     end
 
     test "change_channel/1 returns a channel changeset" do
