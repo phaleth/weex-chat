@@ -15,7 +15,7 @@ class Message {
         top: this.messagesContainer.scrollHeight,
         behavior: "smooth",
       });
-    }, 100);
+    }, 225);
   }
 
   submitForm(el) {
