@@ -299,31 +299,37 @@ defmodule WeexChatWeb.MessageLive.Index do
   end
 
   defp create_channel_by_name(socket, channel_name, user_id) do
-    case Rooms.create_channel(%{
-           name: channel_name,
-           creator_id: user_id,
-           user_is_guest: is_nil(user_id)
-         }) do
-      {:ok, channel} ->
-        channels = activate_channel(socket.assigns.channels, channel, user_id)
-        channel = get_active_channel(channels)
-        channel_name = get_active_channel_name(channel)
+    channel = List.first(Rooms.get_channel(channel_name))
 
-        user_names = current_channel_user_names(channel_name)
+    if is_nil(channel) do
+      case Rooms.create_channel(%{
+             name: channel_name,
+             creator_id: user_id,
+             user_is_guest: is_nil(user_id)
+           }) do
+        {:ok, channel} ->
+          channels = activate_channel(socket.assigns.channels, channel, user_id)
+          channel = get_active_channel(channels)
+          channel_name = get_active_channel_name(channel)
 
-        socket
-        |> assign(
-          active_channel_name: channel_name,
-          channels: channels,
-          user_names: user_names,
-          channel_index: get_active_channel_index(channel),
-          user_count: length(user_names)
-        )
-        |> push_event("hooray", %{})
+          user_names = current_channel_user_names(channel_name)
 
-      {:error, %Ecto.Changeset{} = changeset} ->
-        {_, error} = List.first(changeset.errors)
-        socket |> put_flash(:error, elem(error, 0))
+          socket
+          |> assign(
+            active_channel_name: channel_name,
+            channels: channels,
+            user_names: user_names,
+            channel_index: get_active_channel_index(channel),
+            user_count: length(user_names)
+          )
+          |> push_event("hooray", %{})
+
+        {:error, %Ecto.Changeset{} = changeset} ->
+          {_, error} = List.first(changeset.errors)
+          socket |> put_flash(:error, elem(error, 0))
+      end
+    else
+      join_channel_by_name(socket, channel_name, user_id)
     end
   end
 
