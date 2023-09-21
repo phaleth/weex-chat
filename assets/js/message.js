@@ -7,15 +7,18 @@ class Message {
 
     this.messagesContainer =
       document.getElementById("messages-container").parentElement;
+
+    this.lag = 225;
   }
 
   scrollToBottom() {
+    console.log(this.lag);
     setTimeout(() => {
       this.messagesContainer.scroll({
         top: this.messagesContainer.scrollHeight,
         behavior: "smooth",
       });
-    }, 225);
+    }, this.lag);
   }
 
   submitForm(el) {

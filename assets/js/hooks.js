@@ -10,7 +10,9 @@ export default {
         if (count >= 5) {
           const beforeTime = new Date().getTime();
           this.pushEvent("ping", {}, (_res) => {
-            this.el.innerText = `${(new Date().getTime() - beforeTime) / 1000}`;
+            const lag = new Date().getTime() - beforeTime;
+            message.lag = lag + 25;
+            this.el.innerText = `${lag / 1000}`;
           });
           count = 0;
         }
