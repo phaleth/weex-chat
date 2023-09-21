@@ -24,15 +24,15 @@ defmodule WeexChatWeb.Components.Chat do
       <div
         phx-hook="setupLists"
         id="setup-lists"
-        class="wxch-chans-list hidden sm:block flex-none w-auto max-h-40 sm:max-h-screen px-1 border-b-2 sm:border-b-0 sm:border-r-2 border-green-500 dark:border-sky-600 overflow-x-auto sm:overflow-x-hidden"
+        class="wxch-chans-list hidden sm:block flex-none w-auto max-h-40 sm:max-h-screen px-1 border-b-2 sm:border-b-0 sm:border-r-2 border-green-700 dark:border-sky-600 overflow-x-auto sm:overflow-x-hidden"
       >
         <div class="grid grid-cols-1">
           <div class="flex gap-0.5 cursor-pointer">
-            <div class="w-6 text-right text-green-400 dark:text-lime-700">1.</div>
+            <div class="w-6 text-right text-lime-600 dark:text-lime-700">1.</div>
             <div class="text-red-800 dark:text-indigo-600">network</div>
           </div>
           <div class="flex gap-0.5">
-            <div class="w-6 text-right text-green-400 dark:text-lime-700"></div>
+            <div class="w-6 text-right text-lime-600 dark:text-lime-700"></div>
             <div class="text-gray-700 dark:text-gray-400">weexchat</div>
           </div>
         </div>
@@ -40,9 +40,9 @@ defmodule WeexChatWeb.Components.Chat do
           <%= for channel <- @channels do %>
             <div
               phx-click={JS.push("activate-chan", value: %{id: channel.id})}
-              class={"flex gap-5 cursor-pointer" <> if(channel.active, do: " bg-green-500 dark:bg-blue-700 text-gray-700 dark:text-gray-400", else: "")}
+              class={"flex gap-5 cursor-pointer" <> if(channel.active, do: " bg-green-400 dark:bg-blue-400 text-gray-700 dark:text-gray-400", else: "")}
             >
-              <div class="w-6 text-right text-green-400 dark:text-lime-700">
+              <div class="w-6 text-right text-lime-800 dark:text-lime-700">
                 <%= channel.index + 2 %>.
               </div>
               <div>#<%= channel.name %></div>
@@ -79,7 +79,7 @@ defmodule WeexChatWeb.Components.Chat do
                     >
                       <%= message.from %>
                     </div>
-                    <div class={"wxch-msg wxch-msg-#{channel.name} px-1 text-green-600 dark:text-lime-400" <> if(channel.active, do: "", else: " hidden")}>
+                    <div class={"wxch-msg wxch-msg-#{channel.name} px-1 text-pink-900 dark:text-lime-400" <> if(channel.active, do: "", else: " hidden")}>
                       ╡
                     </div>
                     <div class={"wxch-msg wxch-msg-#{channel.name} flex group" <> if(channel.active, do: "", else: " hidden")}>
@@ -88,7 +88,7 @@ defmodule WeexChatWeb.Components.Chat do
                         :if={@current_user && @current_user.id == message.user_id}
                         id={"mod-#{channel.name}-#{id}"}
                         phx-hook="modMsg"
-                        class="flex-none ml-2 hidden group-hover:inline cursor-pointer text-lime-200"
+                        class="flex-none ml-2 hidden group-hover:inline cursor-pointer text-lime-600 dark:text-lime-200"
                       >
                         &#128393;
                       </span>
@@ -109,17 +109,17 @@ defmodule WeexChatWeb.Components.Chat do
           </div>
           <div class="flex-none h-12">
             <div class="h-5 text-ellipsis overflow-hidden">
-              <span class="text-purple-700 dark:text-cyan-700">[</span><span :if={@loading}>--:--</span><span
+              <span class="text-cyan-800 dark:text-cyan-700">[</span><span :if={@loading}>--:--</span><span
                 :if={!@loading}
                 phx-hook="currentTime"
                 id="current-time"
               ><%= DateTime.utc_now() |> DateTime.add(@offset, :hour)
-              |> Calendar.strftime("%H:%M") %></span><span class="text-purple-700 dark:text-cyan-700">]</span> <span class="text-purple-700 dark:text-cyan-700">[</span>-<span class="text-purple-700 dark:text-cyan-700">]</span> <span class="text-purple-700 dark:text-cyan-700">[</span>-<span class="text-purple-700 dark:text-cyan-700">/</span>-<span class="text-purple-700 dark:text-cyan-700">]</span>
-              <span class="text-green-600 dark:text-yellow-200"><%= @channel_index + 2 %></span><span class="text-purple-700 dark:text-cyan-700">:</span><span class="text-green-600 dark:text-lime-400">#<%= @active_channel_name %></span><span class="text-purple-700 dark:text-cyan-700">(</span>+nt<span class="text-purple-700 dark:text-cyan-700">){</span><%= @user_count %><span class="text-purple-700 dark:text-cyan-700">} [</span>Lag:
-              <span class="text-green-600 dark:text-yellow-200" id="ping" phx-hook="ping">-----</span><span class="text-purple-700 dark:text-cyan-700">]</span>
+              |> Calendar.strftime("%H:%M") %></span><span class="text-cyan-800 dark:text-cyan-700">]</span> <span class="text-cyan-800 dark:text-cyan-700">[</span>-<span class="text-cyan-800 dark:text-cyan-700">]</span> <span class="text-cyan-800 dark:text-cyan-700">[</span>-<span class="text-cyan-800 dark:text-cyan-700">/</span>-<span class="text-cyan-800 dark:text-cyan-700">]</span>
+              <span class="text-pink-900 dark:text-yellow-200"><%= @channel_index + 2 %></span><span class="text-cyan-800 dark:text-cyan-700">:</span><span class="text-pink-900 dark:text-lime-400">#<%= @active_channel_name %></span><span class="text-cyan-800 dark:text-cyan-700">(</span>+nt<span class="text-cyan-800 dark:text-cyan-700">){</span><%= @user_count %><span class="text-cyan-800 dark:text-cyan-700">} [</span>Lag:
+              <span class="text-pink-900 dark:text-yellow-200" id="ping" phx-hook="ping">-----</span><span class="text-cyan-800 dark:text-cyan-700">]</span>
             </div>
             <div class="flex">
-              <span class="flex-none text-purple-700 dark:text-cyan-700">[</span><span class="text-indigo-500 dark:text-teal-500"><%= @user_name %></span><span class="text-purple-700 dark:text-cyan-700">(</span>Ziw<span class="text-purple-700 dark:text-cyan-700">)]</span>
+              <span class="flex-none text-cyan-800 dark:text-cyan-700">[</span><span class="text-indigo-700 dark:text-teal-500"><%= @user_name %></span><span class="text-cyan-800 dark:text-cyan-700">(</span>Ziw<span class="text-cyan-800 dark:text-cyan-700">)]</span>
               <form class="flex-auto" id="msg-form" phx-submit="new-msg">
                 <input
                   class="wxch-remove-box-shadow pt-0 pb-1.5 px-1.5 h-5 w-full border-none bg-gray-200 dark:bg-black text-black dark:text-gray-300 placeholder-gray-600 dark:placeholder-gray-400 font-mono text-sm"
@@ -139,12 +139,12 @@ defmodule WeexChatWeb.Components.Chat do
           </div>
         </div>
       </div>
-      <div class="wxch-users-list hidden sm:block flex-none w-auto max-h-40 sm:max-h-screen px-1 border-t-2 sm:border-t-0 sm:border-l-2 border-green-500 dark:border-sky-600 overflow-x-auto sm:overflow-x-hidden">
+      <div class="wxch-users-list hidden sm:block flex-none w-auto max-h-40 sm:max-h-screen px-1 border-t-2 sm:border-t-0 sm:border-l-2 border-green-700 dark:border-sky-600 overflow-x-auto sm:overflow-x-hidden">
         <div class="flex">
           <%= if Enum.empty?(@user_names) do %>
             <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
           <% else %>
-            <div class="text-green-400 dark:text-lime-700">@</div>
+            <div class="text-lime-600 dark:text-lime-700">@</div>
             <div>ChanServ</div>
           <% end %>
         </div>
