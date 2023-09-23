@@ -1,6 +1,6 @@
 defmodule WeexChat.Generators.Color do
   @moduledoc false
-  def get(text) do
+  def get_hsl(text, phx_ref) do
     case text do
       "ℹ" ->
         "#e5e7eb"
@@ -14,9 +14,24 @@ defmodule WeexChat.Generators.Color do
       "" ->
         "#fff"
 
+      "Anonymous" ->
+        if(is_nil(phx_ref),
+          do: text,
+          else: phx_ref
+        )
+        |> apply_hue()
+
       _ ->
-        hue = to_charlist(text) |> Enum.sum() |> rem(360)
-        "hsl(#{hue}, 70%, 40%)"
+        apply_hue(text)
     end
+  end
+
+  def apply_hue(text) do
+    hue =
+      to_charlist(text)
+      |> Enum.sum()
+      |> rem(360)
+
+    "hsl(#{hue}, 70%, 40%)"
   end
 end

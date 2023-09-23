@@ -5,6 +5,6 @@ defmodule WeexChat.Chat.Services.Color do
 
   def list_messages() do
     Chat.list_messages()
-    |> Enum.map(&Map.put(&1, :from_color, Color.get(&1.from)))
+    |> Enum.map(&Map.put(&1, :from_color, Color.get_hsl(&1.from, nil)))
   end
 end

@@ -135,6 +135,7 @@ defmodule WeexChatWeb.MessageLive.Index do
 
     new_msg_socket = fn new_msg_id, active_channel ->
       active_channel_name = active_channel.name
+      "phx-" <> phx_ref = socket.id
 
       message =
         if String.length(content) > 0,
@@ -144,7 +145,7 @@ defmodule WeexChatWeb.MessageLive.Index do
             from: user_name,
             content: content,
             channel_name: active_channel_name,
-            from_color: WeexChat.Generators.Color.get(user_name),
+            from_color: WeexChat.Generators.Color.get_hsl(user_name, phx_ref),
             inserted_at: DateTime.utc_now()
           },
           else: nil
