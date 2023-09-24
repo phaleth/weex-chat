@@ -8,11 +8,15 @@ defmodule WeexChatWeb.MessageLive.Index do
   alias WeexChat.Accounts
   alias WeexChat.Rooms
   alias WeexChatWeb.Presence
+  alias WeexChat.Accounts.User
+  alias WeexChat.Repo
+  alias WeexChat.Generators
 
   @one_second 1_000
   @default_name "n/a"
   @user_list "userlist"
   @messages "messages"
+  @anon_user_name "Anonymous"
 
   @impl true
   def mount(_params, _session, socket) do
@@ -83,17 +87,14 @@ defmodule WeexChatWeb.MessageLive.Index do
 
   @impl true
   def handle_event("setup-lists", _params, socket) do
-    {_, user_name} = get_user_id_and_name(socket.assigns)
-
     Presence.track(self(), @user_list, socket.id, %{
-      user_name: user_name
+      user: get_user(socket)
     })
 
     WeexChatWeb.Endpoint.subscribe(@user_list)
 
     messages = Color.list_messages()
     last_msg = List.last(messages)
-    newest_message_id = if is_nil(last_msg), do: 0, else: last_msg.id
 
     channels = setup_channels(socket.assigns)
     channel = get_active_channel(channels)
@@ -106,7 +107,7 @@ defmodule WeexChatWeb.MessageLive.Index do
     {:noreply,
      socket
      |> assign(
-       newest_message_id: newest_message_id,
+       newest_message_id: if(is_nil(last_msg), do: 0, else: last_msg.id),
        active_channel_name: channel_name,
        channels: channels,
        user_names: user_names,
@@ -135,7 +136,6 @@ defmodule WeexChatWeb.MessageLive.Index do
 
     new_msg_socket = fn new_msg_id, active_channel ->
       active_channel_name = active_channel.name
-      "phx-" <> phx_ref = socket.id
 
       message =
         if String.length(content) > 0,
@@ -145,7 +145,7 @@ defmodule WeexChatWeb.MessageLive.Index do
             from: user_name,
             content: content,
             channel_name: active_channel_name,
-            from_color: WeexChat.Generators.Color.get_hsl(user_name, phx_ref),
+            from_color: Generators.Color.get_hsl(user_name, get_phx_ref(socket)),
             inserted_at: DateTime.utc_now()
           },
           else: nil
@@ -232,12 +232,31 @@ defmodule WeexChatWeb.MessageLive.Index do
      |> stream(:messages, [], reset: true)}
   end
 
+  defp get_phx_ref(socket) do
+    "phx-" <> phx_ref = socket.id
+    phx_ref
+  end
+
+  defp get_user(socket) do
+    user = socket.assigns[:current_user]
+
+    if user,
+      do:
+        Repo.preload(user, :channels)
+        |> Map.put(:from_color, Generators.Color.get_hsl(user.username, nil)),
+      else: %User{
+        username: @anon_user_name,
+        channels: [],
+        from_color: Generators.Color.get_hsl(@anon_user_name, get_phx_ref(socket))
+      }
+  end
+
   defp get_user_id_and_name(assigns) do
     user = assigns[:current_user]
 
     if user,
       do: {user.id, user.username},
-      else: {nil, "Anonymous"}
+      else: {nil, @anon_user_name}
   end
 
   defp get_active_channel(channels) do
@@ -349,6 +368,8 @@ defmodule WeexChatWeb.MessageLive.Index do
 
       channel = get_active_channel(channels)
 
+      maybe_update_anon_user_chans(user_id, socket.id, fn chans -> chans ++ [channel] end)
+
       user_names = current_channel_user_names(channel_name)
 
       socket
@@ -375,6 +396,9 @@ defmodule WeexChatWeb.MessageLive.Index do
 
       channels = setup_channels(socket.assigns)
       channel = get_active_channel(channels)
+
+      maybe_update_anon_user_chans(user_id, socket.id, fn chans -> List.delete(chans, channel) end)
+
       channel_name = get_active_channel_name(channel)
 
       user_names = current_channel_user_names(channel_name)
@@ -387,6 +411,25 @@ defmodule WeexChatWeb.MessageLive.Index do
         channel_index: get_active_channel_index(channel),
         user_count: length(user_names)
       )
+    end
+  end
+
+  defp maybe_update_anon_user_chans(user_id, socket_id, callback) do
+    if is_nil(user_id) do
+      item =
+        Presence.get_by_key(@user_list, socket_id)[:metas]
+        |> List.first()
+
+      anon_user =
+        item
+        |> Map.get(:user)
+        |> Map.update(:channels, [], callback)
+
+      metas =
+        item
+        |> Map.put(:user, anon_user)
+
+      Presence.update(self(), @user_list, socket_id, metas)
     end
   end
 
@@ -428,20 +471,32 @@ defmodule WeexChatWeb.MessageLive.Index do
     end
   end
 
-  defp user_names_from_presence() do
+  defp users_from_presence(channel_name) do
     Presence.list(@user_list)
     |> Enum.map(fn {_, data} ->
       entry = data[:metas] |> List.first()
-      entry.user_name
+      entry.user
+    end)
+    |> Enum.filter(fn user ->
+      Enum.any?(Enum.map(user.channels, &(&1.name === channel_name)))
     end)
   end
 
   defp current_channel_user_names(channel_name) do
-    MapSet.intersection(
-      Enum.into(user_names_from_presence(), MapSet.new()),
-      Enum.into(WeexChat.Rooms.list_user_names(channel_name), MapSet.new())
-    )
-    |> MapSet.to_list()
+    present_users = users_from_presence(channel_name)
+
+    anon_users =
+      Enum.filter(present_users, &(&1.username === @anon_user_name))
+      |> Enum.map(& &1.username)
+
+    logged_in_users =
+      MapSet.intersection(
+        Enum.into(Enum.map(present_users, & &1.username), MapSet.new()),
+        Enum.into(WeexChat.Rooms.list_user_names(channel_name), MapSet.new())
+      )
+      |> MapSet.to_list()
+
+    Enum.sort(anon_users ++ logged_in_users)
   end
 
   @impl true
