@@ -9,7 +9,7 @@ defmodule WeexChatWeb.Components.Chat do
   attr :channels, WeexChat.Rooms.Channel
   attr :user_name, :string
   attr :active_channel_name, :string
-  attr :user_names, :list
+  attr :users, :list
   attr :channel_index, :integer
   attr :user_count, :integer
   attr :current_user, WeexChat.Accounts.User
@@ -141,17 +141,17 @@ defmodule WeexChatWeb.Components.Chat do
       </div>
       <div class="wxch-users-list hidden sm:block flex-none w-auto max-h-40 sm:max-h-screen px-1 border-t-2 sm:border-t-0 sm:border-l-2 border-green-700 dark:border-sky-600 overflow-x-auto sm:overflow-x-hidden">
         <div class="flex">
-          <%= if Enum.empty?(@user_names) do %>
+          <%= if Enum.empty?(@users) do %>
             <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
           <% else %>
             <div class="text-lime-600 dark:text-lime-700">@</div>
             <div>ChanServ</div>
           <% end %>
         </div>
-        <%= for user_name <- @user_names do %>
+        <%= for user <- @users do %>
           <div class="flex gap-2">
             <div></div>
-            <div><%= user_name %></div>
+            <div style={"color: #{user.color};"}><%= user.username %></div>
           </div>
         <% end %>
       </div>
