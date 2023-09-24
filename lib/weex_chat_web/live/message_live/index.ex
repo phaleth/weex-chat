@@ -291,6 +291,20 @@ defmodule WeexChatWeb.MessageLive.Index do
     |> change_channel(channel.id)
   end
 
+  defp modify_socket_for_channel_action(socket, channel, channels, users) do
+    channel_name = get_active_channel_name(channel)
+
+    socket
+    |> push_event("change-chan", %{channel: channel_name})
+    |> assign(
+      active_channel_name: channel_name,
+      channels: channels,
+      users: users,
+      channel_index: get_active_channel_index(channel),
+      user_count: length(users)
+    )
+  end
+
   defp create_channel_by_name(socket, channel_name, user_id) do
     channel = List.first(Rooms.get_channel(channel_name))
 
@@ -303,18 +317,11 @@ defmodule WeexChatWeb.MessageLive.Index do
         {:ok, channel} ->
           channels = activate_channel(socket.assigns.channels, channel, user_id)
           channel = get_active_channel(channels)
-          channel_name = get_active_channel_name(channel)
 
           users = current_channel_users(channel_name)
 
           socket
-          |> assign(
-            active_channel_name: channel_name,
-            channels: channels,
-            users: users,
-            channel_index: get_active_channel_index(channel),
-            user_count: length(users)
-          )
+          |> modify_socket_for_channel_action(channel, channels, users)
           |> push_event("hooray", %{})
 
         {:error, %Ecto.Changeset{} = changeset} ->
@@ -346,13 +353,7 @@ defmodule WeexChatWeb.MessageLive.Index do
       users = current_channel_users(channel_name)
 
       socket
-      |> assign(
-        active_channel_name: channel_name,
-        channels: channels,
-        users: users,
-        channel_index: get_active_channel_index(channel),
-        user_count: length(users)
-      )
+      |> modify_socket_for_channel_action(channel, channels, users)
     end
   end
 
@@ -374,18 +375,10 @@ defmodule WeexChatWeb.MessageLive.Index do
 
       maybe_update_anon_user_chans(user_id, socket.id, fn chans -> List.delete(chans, channel) end)
 
-      channel_name = get_active_channel_name(channel)
-
       users = current_channel_users(channel_name)
 
       socket
-      |> assign(
-        active_channel_name: channel_name,
-        channels: channels,
-        users: users,
-        channel_index: get_active_channel_index(channel),
-        user_count: length(users)
-      )
+      |> modify_socket_for_channel_action(channel, channels, users)
     end
   end
 
