@@ -122,7 +122,7 @@ defmodule WeexChatWeb.Components.Chat do
               <span class="flex-none text-cyan-800 dark:text-cyan-700">[</span><span class="text-indigo-700 dark:text-teal-500"><%= @user_name %></span><span class="text-cyan-800 dark:text-cyan-700">(</span>Ziw<span class="text-cyan-800 dark:text-cyan-700">)]</span>
               <form class="flex-auto" id="msg-form" phx-submit="new-msg">
                 <input
-                  class="wxch-remove-box-shadow pt-0 pb-1.5 px-1.5 h-5 w-full border-none bg-gray-200 dark:bg-black text-black dark:text-gray-300 placeholder-gray-600 dark:placeholder-gray-400 font-mono text-sm"
+                  class="wxch-remove-box-shadow pt-0 pb-1.5 px-1.5 h-5 w-full border-none border-transparent focus:border-transparent focus:ring-0 bg-gray-200 dark:bg-black text-black dark:text-gray-300 placeholder-gray-600 dark:placeholder-gray-400 font-mono text-sm"
                   aria-label="New message"
                   type="text"
                   id="msg"
