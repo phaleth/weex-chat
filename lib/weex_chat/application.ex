@@ -7,6 +7,9 @@ defmodule WeexChat.Application do
 
   @impl true
   def start(_type, _args) do
+    # Run migrations
+    WeexChat.Release.migrate()
+
     children = [
       # Start the Telemetry supervisor
       WeexChatWeb.Telemetry,

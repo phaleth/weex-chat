@@ -2,14 +2,10 @@ import Config
 
 # Configure your database
 config :weex_chat, WeexChat.Repo,
-  username: System.get_env("POSTGRES_USERNAME") || "postgres",
-  password: System.get_env("POSTGRES_PASSWORD") || "postgres",
-  hostname: System.get_env("POSTGRES_HOSTNAME") || "localhost",
-  port: System.get_env("POSTGRES_PORT") || 5432,
-  database: "weex_chat_dev",
+  database: Path.expand("../weex_chat_dev.db", Path.dirname(__ENV__.file)),
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
-  pool_size: 10
+  pool_size: 5
 
 # For development, we disable any cache and enable
 # debugging and code reloading.

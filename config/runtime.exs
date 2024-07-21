@@ -21,22 +21,16 @@ if System.get_env("PHX_SERVER") do
 end
 
 if config_env() == :prod do
-  database_url =
-    System.get_env("DATABASE_URL") ||
+  database_path =
+    System.get_env("DATABASE_PATH") ||
       raise """
-      environment variable DATABASE_URL is missing.
-      For example: ecto://USER:PASS@HOST/DATABASE
+      environment variable DATABASE_PATH is missing.
+      For example: /etc/my_app/my_app.db
       """
 
   config :weex_chat, WeexChat.Repo,
-    ssl: true,
-    url: database_url,
-    pool_size: String.to_integer(System.get_env("POOL_SIZE") || "5"),
-    socket_options: [],
-    ssl_opts: [
-      server_name_indication: ~c"ep-black-band-41026810-pooler.us-west-2.aws.neon.tech",
-      verify: :verify_none
-    ]
+    database: database_path,
+    pool_size: String.to_integer(System.get_env("POOL_SIZE") || "5")
 
   # The secret key base is used to sign/encrypt cookies and other secrets.
   # A default value is used in config/dev.exs and config/test.exs but you

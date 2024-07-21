@@ -1,21 +1,22 @@
-# fly.toml app configuration file generated for weexchat on 2023-08-24T20:32:08+02:00
+# fly.toml app configuration file generated for weexchat on 2024-07-21T15:10:07+02:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = "weexchat"
-primary_region = "sjc"
-kill_signal = "SIGTERM"
-swap_size_mb = 512
+app = 'weexchat'
+primary_region = 'ams'
+kill_signal = 'SIGTERM'
 
 [build]
 
-[deploy]
-  release_command = "/app/bin/migrate"
-
 [env]
-  PHX_HOST = "weexchat.fly.dev"
-  PORT = "8080"
+  DATABASE_PATH = '/data/weex_chat_data/weex_chat_prod.db'
+  PHX_HOST = 'weexchat.fly.dev'
+  PORT = '8080'
+
+[[mounts]]
+  source = 'weex_chat_data'
+  destination = '/data'
 
 [http_service]
   internal_port = 8080
@@ -23,8 +24,12 @@ swap_size_mb = 512
   auto_stop_machines = false
   auto_start_machines = true
   min_machines_running = 1
-  processes = ["app"]
+  processes = ['app']
+
   [http_service.concurrency]
-    type = "connections"
+    type = 'connections'
     hard_limit = 1000
     soft_limit = 1000
+
+[[vm]]
+  size = 'shared-cpu-1x'

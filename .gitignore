@@ -40,3 +40,7 @@ npm-debug.log
 
 # elixir LS
 .elixir_ls
+
+# Database files
+*.db
+*.db-*

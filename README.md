@@ -1,6 +1,12 @@
 # WeexChat
 
-Setup database as docker container
+## Setup development database
+
+```sh
+mix ecto.setup
+```
+
+## Setup test database as a docker container
 
 ```sh
 docker run -d -p 5433:5432 --name=postgres \
@@ -62,7 +68,13 @@ SELECT u0."user_id", u0."channel_id" FROM "users_channels" AS u0 []
 [[2, 2]]
 ```
 
-Start the Phoenix server
+Finally setup the test database
+
+```sh
+mix ecto.setup
+```
+
+## Phoenix server usage
 
 - Run `mix setup` to install and setup dependencies
 - Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
